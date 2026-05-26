@@ -1,7 +1,7 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
     import Map from '@/Components/Map.vue'; // REVERTED TO LEAFLET
-    import { Head, router } from '@inertiajs/vue3'
+    import { Head, router, Link } from '@inertiajs/vue3'
     import { ref, onMounted, computed, watch } from 'vue'
 
     const props = defineProps({
@@ -40,6 +40,8 @@
     // Search State
     const searchQuery = ref('')
     const isSearching = ref(false)
+
+
 
     const currentOrigin = computed(() => {
         if (selectedOrigin.value) return selectedOrigin.value
@@ -433,6 +435,7 @@
         // Debounce slightly to wait for origin to settle
         setTimeout(scanAllRoutes, 1000)
     }, { immediate: true })
+
 </script>
 
 <template>
@@ -447,59 +450,12 @@
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-8">
-                <!-- Telegram Activation Banner (If Not Linked) -->
-                <div
-                    v-if="
-                        !$page.props.isTelegramLinked &&
-                        $page.props.telegramCode
-                    "
-                    class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden animate-fade-in-down"
-                >
-                    <div
-                        class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6"
-                    >
-                        <div>
-                            <h3
-                                class="text-2xl font-black uppercase tracking-wide flex items-center gap-2"
-                            >
-                                <svg
-                                    class="w-8 h-8"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
-                                    />
-                                </svg>
-                                Enable Risk Alerts
-                            </h3>
-                            <p class="text-blue-100 font-medium mt-1">
-                                Connect your Telegram account to receive instant
-                                High Risk warnings for your registered number.
-                            </p>
-                        </div>
-                        <a
-                            :href="`https://t.me/${$page.props.telegramBotName}?start=${$page.props.telegramCode}`"
-                            target="_blank"
-                            class="bg-white text-blue-600 font-black px-8 py-3 rounded-full hover:bg-blue-50 transition transform hover:scale-105 shadow-lg whitespace-nowrap"
-                        >
-                            Activate Now
-                        </a>
-                    </div>
-                    <!-- Background Pattern -->
-                    <svg
-                        class="absolute top-0 right-0 h-full w-auto opacity-10"
-                        fill="currentColor"
-                        viewBox="0 0 100 100"
-                    >
-                        <circle cx="50" cy="50" r="50" />
-                    </svg>
-                </div>
+
 
                 <!-- Admin Stats Widget (Only visible to Admins) -->
                 <div
                     v-if="adminStats"
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-down"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-down"
                 >
                     <div
                         class="bg-blue-900 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden"
@@ -570,31 +526,6 @@
                                 {{ adminStats.active_voyages }} Active Now
                             </div>
                         </div>
-                    </div>
-                    <div
-                        class="bg-white p-6 rounded-2xl shadow-lg border border-blue-100 relative overflow-hidden"
-                    >
-                        <div class="relative z-10">
-                            <div
-                                class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1"
-                            >
-                                Total Reviews
-                            </div>
-                            <div
-                                class="text-3xl sm:text-4xl font-black text-blue-900"
-                            >
-                                {{ adminStats.total_reviews }}
-                            </div>
-                        </div>
-                        <svg
-                            class="absolute -right-2 -bottom-4 w-24 h-24 text-blue-50"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                        >
-                            <path
-                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                            ></path>
-                        </svg>
                     </div>
                 </div>
 
@@ -691,6 +622,10 @@
                                             ({{ geoAnalysisResult.nearest_any_port.risk_status }})
                                         </span>
                                    </div>
+                                   <Link :href="route('schedules.index', { origin_port_id: geoAnalysisResult.nearest_any_port.port.id })" 
+                                         class="mt-3 inline-block px-4 py-2 bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-widest rounded shadow hover:bg-gray-300 transition w-full text-center">
+                                         View Schedules Here
+                                   </Link>
                                 </div>
 
                                 <!-- Recommended Port Card -->
@@ -703,6 +638,10 @@
                                             ({{ geoAnalysisResult.nearest_safe_port.risk_status }})
                                         </span>
                                    </div>
+                                   <Link :href="route('schedules.index', { origin_port_id: geoAnalysisResult.nearest_safe_port.port.id })" 
+                                         class="mt-3 inline-block px-4 py-2 bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest rounded shadow hover:bg-emerald-700 transition w-full text-center">
+                                         Book Safe Route
+                                   </Link>
                                 </div>
                             </div>
                         </div>
@@ -770,6 +709,7 @@
                                     :routes="mapRoutes"
                                     :center="mapCenter"
                                     :zoom="mapZoom"
+
                                     :weather-overlay="selectedOverlay"
                                     @marker-click="handleMapMarkerClick"
                                 />
@@ -806,6 +746,7 @@
                                 >
                                     🌡️ Temp
                                 </button>
+
                             </div>
                             <p class="text-sm text-blue-600/60 mt-4 italic">
                                 * Blue dot represents your location. Click on

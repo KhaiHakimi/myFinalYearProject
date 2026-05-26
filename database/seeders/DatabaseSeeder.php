@@ -170,10 +170,10 @@ class DatabaseSeeder extends Seeder
             $arrival = $current->copy()->addMinutes(15)->format('H:i');
 
             // Butterworth -> Georgetown
-            $this->createSchedule($ferries[$ferryName], $ports['Sultan Abdul Halim Ferry Terminal'], $ports['Swettenham Pier'], $departure, $arrival, 1.20);
+            $this->createSchedule($ferries[$ferryName], $ports['Sultan Abdul Halim Ferry Terminal'], $ports['Swettenham Pier'], $departure, $arrival, 2.00);
 
             // Georgetown -> Butterworth (Simultaneous return usually, slightly offset for single vessel logic, but we'll assume multiple vessels)
-            $this->createSchedule($ferries[$ferryName], $ports['Swettenham Pier'], $ports['Sultan Abdul Halim Ferry Terminal'], $departure, $arrival, 1.20);
+            $this->createSchedule($ferries[$ferryName], $ports['Swettenham Pier'], $ports['Sultan Abdul Halim Ferry Terminal'], $departure, $arrival, 2.00);
 
             $current->addMinutes(30);
             $switch++;

@@ -97,10 +97,18 @@ function updateMarkers() {
 
         const marker = L.marker([m.lat, m.lng], markerOptions);
         
+        // Hover Effect (Tooltip)
+        if (m.title) {
+            marker.bindTooltip(m.title, { 
+                permanent: false, 
+                direction: 'top',
+                offset: [0, -32]
+            });
+        }
+        
+        // Click data (Popup)
         if (m.popup) {
             marker.bindPopup(m.popup);
-        } else if (m.title) {
-            marker.bindTooltip(m.title);
         }
         
         marker.on('click', () => emit('marker-click', m));
@@ -125,7 +133,7 @@ function updateRoutes() {
     });
 }
 
-// ... (existing code)
+
 
 async function updateWeather() {
     if (!map) return;

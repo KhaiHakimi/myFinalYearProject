@@ -9,4 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('schedules:generate-daily')->hourly();
-Schedule::job(new \App\Jobs\CheckRouteSafetyJob)->hourly();
+
+// Shared Hosting Queue Worker Strategy
+// Runs every minute, processes jobs for up to 50 seconds, then exits.
+Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute();

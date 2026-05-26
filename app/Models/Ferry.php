@@ -10,6 +10,7 @@ class Ferry extends Model
         'name',
         'capacity',
         'operator',
+        'operator_id',
         'image_path',
         'rating',
         'reviews_count',
@@ -35,5 +36,13 @@ class Ferry extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * The operator company that runs this ferry.
+     */
+    public function operatorCompany()
+    {
+        return $this->belongsTo(Operator::class, 'operator_id');
     }
 }

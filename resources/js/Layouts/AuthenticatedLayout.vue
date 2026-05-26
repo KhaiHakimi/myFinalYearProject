@@ -5,6 +5,7 @@
     import DropdownLink from '@/Components/DropdownLink.vue'
     import NavLink from '@/Components/NavLink.vue'
     import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
+    import Chatbot from '@/Components/Chatbot.vue'
     import { Link } from '@inertiajs/vue3'
 
     const showingNavigationDropdown = ref(false)
@@ -75,6 +76,13 @@
                             >
                                 Manage Ferries
                             </NavLink>
+                            <NavLink
+                                v-if="$page.props.auth.user.is_admin"
+                                :href="route('admin.channel_manager')"
+                                :active="route().current('admin.channel_manager')"
+                            >
+                                Channel Manager
+                            </NavLink>
                         </div>
                     </div>
 
@@ -109,6 +117,23 @@
                                 <template #content>
                                     <DropdownLink :href="route('profile.edit')">
                                         Profile
+                                    </DropdownLink>
+                                    <DropdownLink
+                                        :href="route('bookings.index')"
+                                    >
+                                        My Bookings
+                                    </DropdownLink>
+                                    <DropdownLink
+                                        v-if="$page.props.auth.user?.is_admin"
+                                        :href="route('admin.analytics_page')"
+                                    >
+                                        📊 Analytics
+                                    </DropdownLink>
+                                    <DropdownLink
+                                        v-if="$page.props.auth.user?.is_admin"
+                                        :href="route('admin.channel_manager')"
+                                    >
+                                        🔗 Channel Manager
                                     </DropdownLink>
                                     <DropdownLink
                                         :href="route('logout')"
@@ -199,6 +224,13 @@
                     >
                         Manage Ferries
                     </ResponsiveNavLink>
+                    <ResponsiveNavLink
+                        v-if="$page.props.auth.user.is_admin"
+                        :href="route('admin.channel_manager')"
+                        :active="route().current('admin.channel_manager')"
+                    >
+                        Channel Manager
+                    </ResponsiveNavLink>
                 </div>
 
                 <!-- Responsive Settings Options -->
@@ -215,6 +247,23 @@
                     <div class="mt-3 space-y-1">
                         <ResponsiveNavLink :href="route('profile.edit')">
                             Profile
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            :href="route('bookings.index')"
+                        >
+                            My Bookings
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="$page.props.auth.user?.is_admin"
+                            :href="route('admin.analytics_page')"
+                        >
+                            📊 Analytics
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            v-if="$page.props.auth.user?.is_admin"
+                            :href="route('admin.channel_manager')"
+                        >
+                            🔗 Channel Manager
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             :href="route('logout')"
@@ -239,5 +288,7 @@
         <main class="relative z-10">
             <slot />
         </main>
+        
+        <Chatbot />
     </div>
 </template>

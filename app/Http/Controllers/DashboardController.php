@@ -8,111 +8,134 @@ use SplFileObject;
 
 class DashboardController extends Controller
 {
+    /**
+     * Render the main dashboard with admin stats (when applicable).
+     */
     public function index()
     {
-        $adminStats = null;
         $user = auth()->user();
+        $adminStats = null;
 
         if ($user && $user->is_admin) {
             $adminStats = [
-                'total_users' => \App\Models\User::count(),
-                'total_ferries' => \App\Models\Ferry::count(),
-                'active_voyages' => \App\Models\Schedule::where('departure_time', '>=', now())->count(),
-                'total_schedules' => \App\Models\Schedule::count(), // Added total_schedules as it uses it in Vue
-                'total_ports' => \App\Models\Port::count(),
-                'total_reviews' => \App\Models\Review::count(),
+                'total_users'     => \App\Models\User::count(),
+                'total_ferries'   => \App\Models\Ferry::count(),
+                'active_voyages'  => \App\Models\Schedule::where('departure_time', '>=', now())->count(),
+                'total_schedules' => \App\Models\Schedule::count(),
+                'total_ports'     => \App\Models\Port::count(),
             ];
-            // Note: System logs are no longer loaded here to improve performance.
-            // They should be fetched asynchronously if needed.
         }
 
+        $ports = \App\Models\Port::whereHas('departures')->orWhereHas('arrivals')->with('latestWeather')->get();
+
+        // --- DUMMY DATA INJECTION (MERSING ONLY) ---
+        foreach ($ports as $port) {
+            if (str_contains(strtolower($port->name), 'mersing')) {
+                $port->setRelation('latestWeather', new \App\Models\WeatherData([
+                    'port_id' => $port->id,
+                    'timestamp' => now(),
+                    'wind_speed' => 65.5,
+                    'wind_direction' => 210,
+                    'temperature' => 28.0,
+                    'precipitation' => 45.0,
+                    'wave_height' => 3.2,
+                    'condition_code' => 65,
+                    'risk_status' => 'High Risk',
+                    'risk_score' => 92,
+                ]));
+            }
+        }
+        // -------------------------------------------
+
         return Inertia::render('Dashboard', [
-            'ports' => \App\Models\Port::whereHas('departures')->orWhereHas('arrivals')->with('latestWeather')->get(),
-            'adminStats' => $adminStats,
-            'systemLogs' => [], // Empty by default
-            'telegramCode' => $user ? $user->telegram_verification_code : null,
-            'telegramBotName' => config('services.telegram.bot_username'),
-            'isTelegramLinked' => $user ? ! empty($user->telegram_chat_id) : false,
+            'ports'           => $ports,
+            'adminStats'      => $adminStats,
+            'systemLogs'      => [],
         ]);
     }
 
+    /**
+     * Return the latest 50 log entries for the admin panel (AJAX).
+     */
     public function systemLogs()
     {
-        if (! auth()->user() || ! auth()->user()->is_admin) {
+        if (! auth()->user()?->is_admin) {
             return response()->json([]);
         }
 
-        $systemLogs = [];
         $logPath = storage_path('logs/laravel.log');
+        $entries = [];
 
-        if (file_exists($logPath)) {
-            try {
-                $file = new SplFileObject($logPath, 'r');
-                $file->seek(PHP_INT_MAX);
-                $lastLine = $file->key();
-
-                // Get last 50 lines efficiently
-                $lines = [];
-                // Ensure we don't seek before 0
-                $start = max(0, $lastLine - 50);
-
-                // If file is empty or near empty
-                if ($lastLine > 0) {
-                    $file->seek($start);
-
-                    while (! $file->eof()) {
-                        $line = $file->current();
-                        if (trim($line)) {
-                            $lines[] = $line;
-                        }
-                        $file->next();
-                    }
-                }
-
-                $lines = array_reverse($lines);
-
-                foreach ($lines as $line) {
-                    // Try to match standard Laravel log format: [Date Time] env.LEVEL: Message
-                    if (preg_match('/^\[(?<date>.*?)\] (?<env>\w+)\.(?<level>\w+): (?<message>.*)/', $line, $matches)) {
-                        $systemLogs[] = [
-                            'date' => $matches['date'],
-                            'level' => $matches['level'],
-                            'message' => $matches['message'],
-                        ];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Log file might be empty or not readable, return empty
-            }
+        if (! file_exists($logPath)) {
+            return response()->json([]);
         }
 
-        return response()->json($systemLogs);
+        try {
+            $file = new SplFileObject($logPath, 'r');
+            $file->seek(PHP_INT_MAX);
+            $totalLines = $file->key();
+
+            if ($totalLines === 0) {
+                return response()->json([]);
+            }
+
+            $file->seek(max(0, $totalLines - 50));
+            $lines = [];
+
+            while (! $file->eof()) {
+                $line = trim($file->current());
+                if ($line) {
+                    $lines[] = $line;
+                }
+                $file->next();
+            }
+
+            foreach (array_reverse($lines) as $line) {
+                if (preg_match('/^\[(?<date>.*?)\] (?<env>\w+)\.(?<level>\w+): (?<message>.*)/', $line, $m)) {
+                    $entries[] = [
+                        'date'    => $m['date'],
+                        'level'   => $m['level'],
+                        'message' => $m['message'],
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            // Log file unreadable – return empty
+        }
+
+        return response()->json($entries);
     }
 
-    public function geoAnalysis(\Illuminate\Http\Request $request, \App\Services\GeoIntelligenceService $geoService)
+    /**
+     * Geo-intelligence: analyse nearby ports relative to a coordinate.
+     */
+    public function geoAnalysis(\Illuminate\Http\Request $request, \App\Services\GeoIntelligenceService $geo)
     {
         $request->validate([
             'lat' => 'required|numeric',
             'lng' => 'required|numeric',
         ]);
 
-        $analysis = $geoService->analyzeLocation($request->lat, $request->lng);
-
-        return response()->json($analysis);
+        return response()->json(
+            $geo->analyzeLocation($request->lat, $request->lng)
+        );
     }
 
-    public function analyzeRoute(\Illuminate\Http\Request $request, \App\Services\GeoIntelligenceService $geoService)
+    /**
+     * Geo-intelligence: scan weather along a route's mid-sea waypoints.
+     */
+    public function analyzeRoute(\Illuminate\Http\Request $request, \App\Services\GeoIntelligenceService $geo)
     {
         $request->validate([
-            'origin_id' => 'required|exists:ports,id',
+            'origin_id'      => 'required|exists:ports,id',
             'destination_id' => 'required|exists:ports,id',
         ]);
 
         $origin = \App\Models\Port::find($request->origin_id);
-        $dest = \App\Models\Port::find($request->destination_id);
+        $dest   = \App\Models\Port::find($request->destination_id);
 
-        $analysis = $geoService->analyzeRouteViability($origin, $dest);
-
-        return response()->json($analysis);
+        return response()->json(
+            $geo->analyzeRouteViability($origin, $dest)
+        );
     }
 }

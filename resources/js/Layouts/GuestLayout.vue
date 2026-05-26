@@ -6,6 +6,7 @@
     import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
     import Dropdown from '@/Components/Dropdown.vue'
     import DropdownLink from '@/Components/DropdownLink.vue'
+    import Chatbot from '@/Components/Chatbot.vue'
 
     const props = defineProps({
         fullWidth: {
@@ -116,6 +117,17 @@
                             >
                                 Manage Ferries
                             </NavLink>
+                            <NavLink
+                                v-if="
+                                    $page.props.auth &&
+                                    $page.props.auth.user &&
+                                    $page.props.auth.user.is_admin
+                                "
+                                :href="route('admin.channel_manager')"
+                                :active="route().current('admin.channel_manager')"
+                            >
+                                Channel Manager
+                            </NavLink>
                         </div>
                     </div>
 
@@ -156,6 +168,23 @@
                                             :href="route('profile.edit')"
                                         >
                                             Profile
+                                        </DropdownLink>
+                                        <DropdownLink
+                                            :href="route('bookings.index')"
+                                        >
+                                            My Bookings
+                                        </DropdownLink>
+                                        <DropdownLink
+                                            v-if="$page.props.auth.user?.is_admin"
+                                            :href="route('admin.analytics_page')"
+                                        >
+                                            📊 Analytics
+                                        </DropdownLink>
+                                        <DropdownLink
+                                            v-if="$page.props.auth.user?.is_admin"
+                                            :href="route('admin.channel_manager')"
+                                        >
+                                            🔗 Channel Manager
                                         </DropdownLink>
                                         <DropdownLink
                                             :href="route('logout')"
@@ -264,6 +293,17 @@
                     >
                         Manage Ferries
                     </ResponsiveNavLink>
+                    <ResponsiveNavLink
+                        v-if="
+                            $page.props.auth &&
+                            $page.props.auth.user &&
+                            $page.props.auth.user.is_admin
+                        "
+                        :href="route('admin.channel_manager')"
+                        :active="route().current('admin.channel_manager')"
+                    >
+                        Channel Manager
+                    </ResponsiveNavLink>
                 </div>
                 <div class="border-t border-blue-800 pb-1 pt-4">
                     <div class="mt-3 space-y-1 px-4">
@@ -280,6 +320,9 @@
                             </div>
                             <ResponsiveNavLink :href="route('dashboard')"
                                 >Dashboard</ResponsiveNavLink
+                            >
+                            <ResponsiveNavLink :href="route('bookings.index')"
+                                >My Bookings</ResponsiveNavLink
                             >
                             <ResponsiveNavLink :href="route('profile.edit')"
                                 >Profile</ResponsiveNavLink
@@ -341,6 +384,8 @@
                 <slot />
             </main>
         </div>
+        
+        <Chatbot />
     </div>
 </template>
 

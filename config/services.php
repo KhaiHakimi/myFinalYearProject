@@ -41,4 +41,9 @@ return [
         'bot_username' => env('TELEGRAM_BOT_USERNAME', 'FerCasterBot'),
     ],
 
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
 ];

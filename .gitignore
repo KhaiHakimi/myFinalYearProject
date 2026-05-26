@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+ferrycast_deploy.zip
+
+ai_service/trained_model/*.pkl
+
+hostinger_env.txt

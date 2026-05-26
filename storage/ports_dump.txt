@@ -1,0 +1,28 @@
+1 | Kuala Perlis Jetty | Kuala Perlis, Perlis
+2 | Kuala Kedah Jetty | Kuala Kedah, Kedah
+3 | Kuah Jetty (Langkawi) | Kuah, Langkawi
+5 | Swettenham Pier | Georgetown, Penang
+6 | Sultan Abdul Halim Ferry Terminal | Butterworth, Penang
+7 | Lumut Jetty | Lumut, Perak
+8 | Marina Island Jetty | Lumut, Perak
+9 | Pulau Pangkor Jetty | Pangkor Island
+10 | South Port Passenger Terminal | Port Klang, Selangor
+11 | Pulau Ketam Jetty | Pulau Ketam, Selangor
+12 | Mersing Jetty | Mersing, Johor
+13 | Tanjung Gemok Jetty | Kuala Rompin, Pahang
+14 | Tioman Island Marina | Tioman Island, Pahang
+16 | Puteri Harbour International Ferry Terminal | Iskandar Puteri, Johor
+17 | Melaka International Ferry Terminal | Melaka City, Melaka
+18 | Dumai Ferry Terminal | Dumai, Indonesia
+19 | Bengkalis Ferry Terminal | Bengkalis, Indonesia
+20 | Batam Centre Ferry Terminal | Batam, Indonesia
+22 | Shahbandar Jetty | Kuala Terengganu
+23 | Merang Jetty | Setiu, Terengganu
+24 | Kuala Besut Jetty | Besut, Terengganu
+25 | Redang Island Jetty | Redang Island
+26 | Perhentian Island Jetty | Perhentian Island
+27 | Marang Jetty | Marang, Terengganu
+28 | Kapas Island Jetty | Kapas Island
+29 | Tanjung Lembung Port | Langkawi
+30 | Jeti Tanjung Emas Muar | Muar, Johor
+31 | Harbour Bay Ferry Terminal | Batam, Indonesia

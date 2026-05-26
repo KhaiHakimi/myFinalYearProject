@@ -14,35 +14,19 @@ start
 :Received API Request;
 :Extract Weather Parameters
 (Wind, Waves, Visibility);
-:Send POST /predict-risk to AI Service;
-
-|#MistyRose|AI Service (Python)|
-:Receive JSON Payload;
-:Format Input as DataFrame
-[wind_speed, wave_height, visibility];
-
-partition "Random Forest Prediction" {
-    :Input Data into Model;
-    :Calculate Probabilities (predict_proba);
-    note right
-      P(Safe)
-      P(Caution)
-      P(High Risk)
-    end note
-}
+:Calculate Wave Score (Waves / 3.0 * 100);
+:Calculate Wind Score (Wind / 60.0 * 100);
 
 partition "Cancellation Probability Logic" {
     :Apply Weighted Formula;
     note right
-      Prob = (P(High) * 100)
-           + (P(Caution) * 40)
+      Risk Score = (Wave Score * 0.7) + (Wind Score * 0.3)
     end note
-    :Clamp result (0.1% - 99.9%);
 }
 
-if (Prob > 75% ?) then (Yes)
+if (Risk Score >= 70 OR Waves > 2.0 OR Wind > 50) then (Yes)
     :Set Status = **High Risk**;
-elseif (Prob > 30% ?) then (Yes)
+elseif (Risk Score >= 30) then (Yes)
     :Set Status = **Caution**;
 else (No)
     :Set Status = **Safe**;
@@ -56,8 +40,6 @@ note right
   }
 end note
 
-|#LightGray|Laravel Backend|
-:Receive Risk Analysis;
 :Return Data to Frontend;
 
 |User|

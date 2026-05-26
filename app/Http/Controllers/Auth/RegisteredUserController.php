@@ -45,7 +45,6 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone_number' => $request->phone_number,
-            'telegram_verification_code' => Str::random(32), // Generate unique code for Deep Linking
             'password' => Hash::make($request->password),
         ]);
 

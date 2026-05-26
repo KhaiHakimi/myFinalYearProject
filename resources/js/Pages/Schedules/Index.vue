@@ -10,6 +10,66 @@
 
         <div class="py-12 bg-cream-50 min-h-screen">
             <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 space-y-8">
+
+                <!-- 0. LIVE DEPARTURE BOARD -->
+                <div v-if="upcomingDepartures && upcomingDepartures.length > 0" class="bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-700">
+                    <div class="px-6 py-4 bg-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <h3 class="text-white font-black text-sm uppercase tracking-[0.2em]">Live Departures</h3>
+                        </div>
+                        <div class="text-yellow-400 font-mono font-black text-sm tabular-nums">
+                            {{ boardTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kuala_Lumpur' }) }}
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-slate-700">
+                                    <th class="px-6 py-3 text-left text-[10px] font-black text-yellow-400 uppercase tracking-widest">Time</th>
+                                    <th class="px-6 py-3 text-left text-[10px] font-black text-yellow-400 uppercase tracking-widest">Origin</th>
+                                    <th class="px-6 py-3 text-left text-[10px] font-black text-yellow-400 uppercase tracking-widest">Destination</th>
+                                    <th class="px-6 py-3 text-left text-[10px] font-black text-yellow-400 uppercase tracking-widest">Vessel</th>
+                                    <th class="px-6 py-3 text-left text-[10px] font-black text-yellow-400 uppercase tracking-widest">Status</th>
+                                    <th class="px-6 py-3 text-right text-[10px] font-black text-yellow-400 uppercase tracking-widest">Countdown</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="dep in upcomingDepartures" :key="dep.id"
+                                    class="border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-6 py-3">
+                                        <span class="text-white font-mono font-black text-sm tabular-nums">
+                                            {{ formatTime(dep.departure_time) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <span class="text-slate-300 font-bold text-sm">{{ dep.origin?.name }}</span>
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <span class="text-slate-300 font-bold text-sm">{{ dep.destination?.name }}</span>
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <span class="text-sky-400 font-bold text-xs">{{ dep.ferry?.name }}</span>
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <span class="font-black text-xs uppercase tracking-wider" :class="getDepartureStatus(dep).class">
+                                            {{ getDepartureStatus(dep).text }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-3 text-right">
+                                        <span v-if="getDepartureCountdown(dep.departure_time)"
+                                            class="font-mono font-black text-sm tabular-nums"
+                                            :class="getDepartureCountdown(dep.departure_time)?.includes('m ') && !getDepartureCountdown(dep.departure_time)?.includes('h') ? 'text-yellow-400' : 'text-emerald-400'">
+                                            {{ getDepartureCountdown(dep.departure_time) }}
+                                        </span>
+                                        <span v-else class="text-slate-600 text-xs font-bold">—</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- 1. Date Navigation -->
                 <div
                     class="flex flex-col md:flex-row items-center justify-between bg-white p-4 md:p-6 rounded-[2rem] shadow-xl border border-blue-50 gap-4"
@@ -322,6 +382,8 @@
                     </div>
                 </div>
 
+
+
                 <!-- 4. Schedule List -->
                 <div class="space-y-10">
                     <!-- Timetable Groups -->
@@ -394,14 +456,9 @@
                                                 RM {{ trip.price }}
                                             </div>
                                             <div
-                                                class="text-[10px] text-gray-400 font-bold uppercase"
+                                                class="text-[10px] text-gray-400 font-bold uppercase mt-1"
                                             >
-                                                {{
-                                                    trip.ferry.ticket_type ===
-                                                    'Walk-in / Counter'
-                                                        ? 'Counter'
-                                                        : 'Online'
-                                                }}
+                                                Standard
                                             </div>
                                         </div>
                                     </div>
@@ -446,6 +503,17 @@
                                         </div>
                                     </div>
 
+                                    <!-- Weather Badge (Mobile) -->
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black border"
+                                              :class="getWeatherBadge(trip).class">
+                                            {{ getWeatherBadge(trip).icon }} {{ getWeatherBadge(trip).label }}
+                                        </span>
+                                        <span v-if="getWeatherBadge(trip).wind" class="text-[10px] text-gray-400 font-bold">
+                                            {{ getWeatherBadge(trip).wind?.toFixed(0) }}km/h · {{ getWeatherBadge(trip).wave?.toFixed(1) }}m
+                                        </span>
+                                    </div>
+
                                     <div
                                         class="flex items-center justify-between border-t border-blue-50 pt-3"
                                     >
@@ -463,20 +531,6 @@
                                             </svg>
                                             {{ trip.ferry.name }}
                                         </div>
-                                        <a
-                                            v-if="
-                                                trip.ferry.ticket_type !==
-                                                'Walk-in / Counter'
-                                            "
-                                            :href="
-                                                trip.ferry.booking_url ||
-                                                'https://www.easybook.com'
-                                            "
-                                            target="_blank"
-                                            class="px-4 py-2 bg-yellow-400 rounded-lg font-black text-[10px] text-blue-900 uppercase tracking-widest shadow-sm"
-                                        >
-                                            Book
-                                        </a>
                                         <div
                                             v-if="
                                                 $page.props.auth.user &&
@@ -550,19 +604,19 @@
                                             </th>
                                             <th
                                                 scope="col"
+                                                class="px-6 py-4 text-center text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
+                                            >
+                                                WEATHER
+                                            </th>
+                                            <th
+                                                scope="col"
                                                 class="px-8 py-4 text-left text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
                                             >
                                                 VESSEL
                                             </th>
                                             <th
                                                 scope="col"
-                                                class="px-8 py-4 text-left text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
-                                            >
-                                                TICKET TYPE
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-8 py-4 text-right text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
+                                                class="px-8 py-4 text-center text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
                                             >
                                                 FARE (RM)
                                             </th>
@@ -571,12 +625,6 @@
                                                 class="px-8 py-4 text-center text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
                                             >
                                                 STATUS
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                class="px-8 py-4 text-center text-[10px] font-black text-blue-900/40 uppercase tracking-widest"
-                                            >
-                                                ACTION
                                             </th>
                                             <th
                                                 v-if="
@@ -650,6 +698,18 @@
                                                     >
                                                 </div>
                                             </td>
+                                            <!-- Weather Badge (Desktop) -->
+                                            <td class="px-6 py-6 whitespace-nowrap text-center">
+                                                <div class="inline-flex flex-col items-center gap-1">
+                                                    <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-black border"
+                                                          :class="getWeatherBadge(trip).class">
+                                                        {{ getWeatherBadge(trip).icon }} {{ getWeatherBadge(trip).label }}
+                                                    </span>
+                                                    <span v-if="getWeatherBadge(trip).wind" class="text-[9px] text-gray-400 font-bold">
+                                                        💨{{ getWeatherBadge(trip).wind?.toFixed(0) }}km/h 🌊{{ getWeatherBadge(trip).wave?.toFixed(1) }}m
+                                                    </span>
+                                                </div>
+                                            </td>
                                             <td
                                                 class="px-8 py-6 whitespace-nowrap"
                                             >
@@ -669,29 +729,6 @@
                                                 </div>
                                             </td>
                                             <td
-                                                class="px-8 py-6 whitespace-nowrap"
-                                            >
-                                                <span
-                                                    class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border"
-                                                    :class="{
-                                                        'bg-emerald-50 text-emerald-600 border-emerald-100':
-                                                            trip.ferry
-                                                                .ticket_type ===
-                                                            'Online Booking',
-                                                        'bg-orange-50 text-orange-600 border-orange-100':
-                                                            trip.ferry
-                                                                .ticket_type ===
-                                                            'Walk-in / Counter',
-                                                        'bg-blue-50 text-blue-600 border-blue-100':
-                                                            trip.ferry
-                                                                .ticket_type ===
-                                                            'Both Available',
-                                                    }"
-                                                >
-                                                    {{ trip.ferry.ticket_type }}
-                                                </span>
-                                            </td>
-                                            <td
                                                 class="px-8 py-6 whitespace-nowrap text-right font-black text-blue-900 text-xl tracking-tighter"
                                             >
                                                 {{ trip.price }}
@@ -706,32 +743,6 @@
                                                     "
                                                 >
                                                     {{ getStatus(trip) }}
-                                                </span>
-                                            </td>
-                                            <td
-                                                class="px-8 py-6 whitespace-nowrap text-center"
-                                            >
-                                                <a
-                                                    v-if="
-                                                        trip.ferry
-                                                            .ticket_type !==
-                                                        'Walk-in / Counter'
-                                                    "
-                                                    :href="
-                                                        trip.ferry
-                                                            .booking_url ||
-                                                        'https://www.easybook.com'
-                                                    "
-                                                    target="_blank"
-                                                    class="inline-flex items-center px-4 py-2 bg-yellow-400 border border-transparent rounded-xl font-black text-[10px] text-blue-900 uppercase tracking-widest hover:bg-yellow-300 focus:outline-none shadow-lg shadow-yellow-100 transition transform active:scale-95"
-                                                >
-                                                    Book Now
-                                                </a>
-                                                <span
-                                                    v-else
-                                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
-                                                >
-                                                    Counter Only
                                                 </span>
                                             </td>
                                             <td
@@ -1328,6 +1339,8 @@
                 </form>
             </div>
         </Modal>
+
+        <!-- No Booking Modal Available Here -->
     </GuestLayout>
 </template>
 
@@ -1335,8 +1348,8 @@
     import GuestLayout from '@/Layouts/GuestLayout.vue'
     import FerryMap from '@/Components/Map.vue'
     import Modal from '@/Components/Modal.vue'
-    import { Head, useForm, router } from '@inertiajs/vue3'
-    import { computed, ref } from 'vue'
+    import { Head, useForm, router, usePage } from '@inertiajs/vue3'
+    import { computed, ref, onMounted, onUnmounted } from 'vue'
 
     // Define Props
     const props = defineProps({
@@ -1350,7 +1363,73 @@
         userLocation: Object,
         filters: Object,
         initialDate: String,
+        portWeather: {
+            type: Object,
+            default: () => ({}),
+        },
+        upcomingDepartures: {
+            type: Array,
+            default: () => [],
+        },
+        availableRoutes: {
+            type: Array,
+            default: () => [],
+        },
     })
+
+    // Weather badge helper
+    const getWeatherBadge = (trip) => {
+        const weather = props.portWeather[trip.origin_port_id]
+        if (!weather) return { icon: '🌤️', label: 'No Data', class: 'bg-gray-100 text-gray-600 border-gray-200' }
+
+        const windSpeed = parseFloat(weather.wind_speed) || 0
+        const waveHeight = parseFloat(weather.wave_height) || 0
+        const riskStatus = weather.risk_status || ''
+
+        if (riskStatus === 'High Risk' || windSpeed > 40 || waveHeight > 2) {
+            return { icon: '⚠️', label: 'Warning', class: 'bg-rose-50 text-rose-700 border-rose-200', wind: windSpeed, wave: waveHeight }
+        } else if (windSpeed > 25 || waveHeight > 1) {
+            return { icon: '💨', label: 'Windy', class: 'bg-amber-50 text-amber-700 border-amber-200', wind: windSpeed, wave: waveHeight }
+        } else if (windSpeed > 15) {
+            return { icon: '🌥️', label: 'Breezy', class: 'bg-blue-50 text-blue-700 border-blue-200', wind: windSpeed, wave: waveHeight }
+        }
+        return { icon: '☀️', label: 'Clear', class: 'bg-emerald-50 text-emerald-700 border-emerald-200', wind: windSpeed, wave: waveHeight }
+    }
+
+    // Departure board time tracking
+    const boardTime = ref(new Date())
+
+    let boardInterval = null
+    onMounted(() => {
+        boardInterval = setInterval(() => { boardTime.value = new Date() }, 1000)
+    })
+    onUnmounted(() => { if (boardInterval) clearInterval(boardInterval) })
+
+    const getDepartureCountdown = (departureTime) => {
+        const now = boardTime.value
+        const dep = new Date(departureTime)
+        const diff = dep - now
+        if (diff <= 0) return null
+        const hours = Math.floor(diff / 3600000)
+        const minutes = Math.floor((diff % 3600000) / 60000)
+        const seconds = Math.floor((diff % 60000) / 1000)
+        if (hours > 24) return null
+        if (hours > 0) return `${hours}h ${minutes}m`
+        if (minutes > 0) return `${minutes}m ${seconds}s`
+        return `${seconds}s`
+    }
+
+    const getDepartureStatus = (dep) => {
+        const now = boardTime.value
+        const departure = new Date(dep.departure_time)
+        const arrival = new Date(dep.arrival_time)
+        const diff = departure - now
+        if (diff > 3600000) return { text: 'SCHEDULED', class: 'text-blue-400' }
+        if (diff > 0 && diff <= 3600000) return { text: 'BOARDING', class: 'text-yellow-400 animate-pulse' }
+        if (diff > 0 && diff <= 900000) return { text: 'FINAL CALL', class: 'text-rose-400 animate-pulse' }
+        if (now >= departure && now <= arrival) return { text: 'DEPARTED', class: 'text-emerald-400' }
+        return { text: 'ARRIVED', class: 'text-gray-400' }
+    }
 
     // Admin Form (Create)
     const form = useForm({
@@ -1506,6 +1585,10 @@
         )
     })
 
+    const handleChatBooking = (scheduleId) => {
+        router.visit(route('schedules.index'))
+    }
+
     const groupedSchedulesCount = computed(() => {
         return Object.values(groupedByOperator.value).reduce(
             (acc, curr) => acc + curr.length,
@@ -1621,7 +1704,7 @@
                 lng: parseFloat(mapMarkers.value[0].lng),
             }
         }
-        return null // Let Map component handle default
+        return { lat: 3.140853, lng: 101.693207 } // Default to KL if no data
     })
 
     const mapZoom = computed(() => {
@@ -1754,4 +1837,20 @@
             timeZone: 'Asia/Kuala_Lumpur',
         })
     }
+
+    onMounted(() => {
+        // Listen for booking URLs triggered by Chatbot across pages
+        const queryParams = new URLSearchParams(window.location.search);
+        const bookId = queryParams.get('book');
+        if (bookId) {
+            // Give time for the schedules to be computed
+            setTimeout(() => {
+                handleChatBooking(bookId);
+            }, 300);
+            
+            // Rewrite URL to remove ?book
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({path:newUrl},'',newUrl);
+        }
+    })
 </script>

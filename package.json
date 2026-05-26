@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite",
+        "dev": "concurrently -k -n \"VITE,AI\" -c \"cyan,magenta\" \"vite\" \"python ai_service/app.py\"",
+        "dev:vite": "vite",
+        "dev:ai": "python ai_service/app.py",
         "format": "prettier --write \"./resources/**/*.{vue,js,css}\""
     },
     "devDependencies": {
@@ -24,8 +26,10 @@
     },
     "dependencies": {
         "@sakitam-gis/maplibre-wind": "^2.0.3",
+        "firebase": "^12.8.0",
         "leaflet": "^1.9.4",
         "leaflet-velocity": "^2.1.4",
-        "maplibre-gl": "^4.7.1"
+        "maplibre-gl": "^4.7.1",
+        "ws": "^8.19.0"
     }
 }

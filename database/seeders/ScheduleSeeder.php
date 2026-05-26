@@ -179,9 +179,9 @@ class ScheduleSeeder extends Seeder
             ],
         ];
 
-        // Generate for next 7 days
+        // Generate for next 14 days from today
         $startDate = Carbon::today();
-        $days = 7;
+        $days = 14;
 
         for ($i = 0; $i < $days; $i++) {
             $currentDate = $startDate->copy()->addDays($i);
