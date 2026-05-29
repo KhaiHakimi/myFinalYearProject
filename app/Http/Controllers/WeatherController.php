@@ -97,7 +97,7 @@ class WeatherController extends Controller
         }
 
         // Build transport price comparison for every destination (always shown)
-        $transportComparisons = $this->buildTransportComparisons($port, $schedules, $riskAnalysis);
+        $transportComparisons = $this->buildTransportComparisons($port, $schedules, $riskAnalysis, $request);
 
         return Inertia::render('Weather/Show', [
             'port'                  => $port,
@@ -150,25 +150,26 @@ class WeatherController extends Controller
     /**
      * Build ferry-vs-flight price comparisons for each destination
      * the current port serves. Always shown so users can compare.
+     * Includes travel cost to the airport and jetty based on user's location.
      */
-    private function buildTransportComparisons(Port $port, $schedules, array $riskAnalysis): array
+    private function buildTransportComparisons(Port $port, $schedules, array $riskAnalysis, Request $request): array
     {
         // Pre-researched flight reference data (one-way, RM)
-        // Keys map destination keywords to flight info
+        // Keys map destination keywords to flight info (with airport coords)
         $flightRef = [
-            'langkawi'  => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Langkawi Intl', 'min' => 80,  'max' => 350, 'dur' => 60,  'airline' => 'AirAsia / Malaysia Airlines'],
-            'penang'    => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Penang Intl',   'min' => 70,  'max' => 250, 'dur' => 55,  'airline' => 'AirAsia / Firefly'],
-            'terengganu'=> ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60,  'airline' => 'AirAsia / Firefly'],
-            'kota_bharu'=> ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Ismail Petra', 'min' => 90, 'max' => 280, 'dur' => 55, 'airline' => 'AirAsia / MAS'],
-            'johor'     => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Senai Intl',    'min' => 80,  'max' => 220, 'dur' => 50,  'airline' => 'AirAsia / MAS'],
-            'dumai'     => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Pinang Kampai (Dumai)', 'min' => 180, 'max' => 550, 'dur' => 80, 'airline' => 'AirAsia via Pekanbaru'],
-            'bengkalis' => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Syarif Kasim II', 'min' => 170, 'max' => 500, 'dur' => 75, 'airline' => 'AirAsia / Lion Air'],
-            'batam'     => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Hang Nadim Intl', 'min' => 120, 'max' => 400, 'dur' => 70, 'airline' => 'AirAsia / Lion Air'],
-            'tioman'    => ['airport' => 'Subang (SZB)', 'dest_airport' => 'Tioman (Berjaya)', 'min' => 250, 'max' => 500, 'dur' => 50, 'airline' => 'Berjaya Air (seasonal)'],
+            'langkawi'  => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Langkawi Intl', 'min' => 80,  'max' => 350, 'dur' => 60,  'airline' => 'AirAsia / Malaysia Airlines'],
+            'penang'    => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Penang Intl',   'min' => 70,  'max' => 250, 'dur' => 55,  'airline' => 'AirAsia / Firefly'],
+            'terengganu'=> ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60,  'airline' => 'AirAsia / Firefly'],
+            'kota_bharu'=> ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Ismail Petra', 'min' => 90, 'max' => 280, 'dur' => 55, 'airline' => 'AirAsia / MAS'],
+            'johor'     => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Senai Intl',    'min' => 80,  'max' => 220, 'dur' => 50,  'airline' => 'AirAsia / MAS'],
+            'dumai'     => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Pinang Kampai (Dumai)', 'min' => 180, 'max' => 550, 'dur' => 80, 'airline' => 'AirAsia via Pekanbaru'],
+            'bengkalis' => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Syarif Kasim II', 'min' => 170, 'max' => 500, 'dur' => 75, 'airline' => 'AirAsia / Lion Air'],
+            'batam'     => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Hang Nadim Intl', 'min' => 120, 'max' => 400, 'dur' => 70, 'airline' => 'AirAsia / Lion Air'],
+            'tioman'    => ['airport' => 'Subang (SZB)', 'lat' => 3.1309, 'lng' => 101.5493, 'dest_airport' => 'Tioman (Berjaya)', 'min' => 250, 'max' => 500, 'dur' => 50, 'airline' => 'Berjaya Air (seasonal)'],
             'pangkor'   => null, // No commercial flights
-            'kapas'     => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60, 'airline' => 'AirAsia + taxi to Marang'],
-            'redang'    => ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60, 'airline' => 'AirAsia + boat from Merang'],
-            'perhentian'=> ['airport' => 'KLIA/KLIA2', 'dest_airport' => 'Sultan Ismail Petra', 'min' => 90, 'max' => 280, 'dur' => 55, 'airline' => 'AirAsia + taxi to Kuala Besut'],
+            'kapas'     => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60, 'airline' => 'AirAsia + taxi to Marang'],
+            'redang'    => ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Mahmud', 'min' => 100, 'max' => 300, 'dur' => 60, 'airline' => 'AirAsia + boat from Merang'],
+            'perhentian'=> ['airport' => 'KLIA/KLIA2', 'lat' => 2.7456, 'lng' => 101.7072, 'dest_airport' => 'Sultan Ismail Petra', 'min' => 90, 'max' => 280, 'dur' => 55, 'airline' => 'AirAsia + taxi to Kuala Besut'],
         ];
 
         // Map destination port names/locations to flight reference keys
@@ -190,6 +191,19 @@ class WeatherController extends Controller
         ];
 
         $isHighRisk = in_array($riskAnalysis['color'], ['red', 'yellow']);
+        
+        $originLat = $request->query('origin_lat');
+        $originLng = $request->query('origin_lng');
+
+        // Distance and cost to jetty
+        $ferryGroundCost = 0;
+        $ferryCostBreakdown = null;
+        if ($originLat && $originLng && $port->latitude && $port->longitude) {
+            $distToJetty = $this->haversine($originLat, $originLng, $port->latitude, $port->longitude);
+            $ferryGroundBreakdown = $this->calculateGroundCost($distToJetty, false);
+            $ferryGroundCost = $ferryGroundBreakdown['total'];
+            $ferryCostBreakdown = $ferryGroundBreakdown;
+        }
 
         $grouped = $schedules->groupBy('destination_port_id');
         $comparisons = [];
@@ -210,10 +224,10 @@ class WeatherController extends Controller
                 }
             }
 
-            // Ferry stats from actual schedule data
-            $ferryPriceMin = (float) $destSchedules->min('price');
-            $ferryPriceMax = (float) $destSchedules->max('price');
-            $ferryPriceAvg = round($destSchedules->avg('price'), 2);
+            // Ferry stats from actual schedule data + ground cost
+            $ferryPriceMin = (float) $destSchedules->min('price') + $ferryGroundCost;
+            $ferryPriceMax = (float) $destSchedules->max('price') + $ferryGroundCost;
+            $ferryPriceAvg = round($destSchedules->avg('price'), 2) + $ferryGroundCost;
             $ferryCount = $destSchedules->count();
 
             $ferryDurations = $destSchedules->map(function ($s) {
@@ -240,6 +254,8 @@ class WeatherController extends Controller
                     'schedule_count'=> $ferryCount,
                     'risk_status'   => $riskAnalysis['status'],
                     'risk_color'    => $riskAnalysis['color'],
+                    'ground_cost'   => $ferryGroundCost,
+                    'cost_breakdown'=> $ferryCostBreakdown,
                 ],
                 'flight'            => null,
                 'cheaper'           => 'ferry',
@@ -250,16 +266,29 @@ class WeatherController extends Controller
             // Build flight comparison if a route exists
             if ($matchedFlightKey && isset($flightRef[$matchedFlightKey]) && $flightRef[$matchedFlightKey]) {
                 $flight = $flightRef[$matchedFlightKey];
-                $flightAvg = round(($flight['min'] + $flight['max']) / 2, 2);
+                
+                // Flight ground cost
+                $flightGroundCost = 0;
+                $flightCostBreakdown = null;
+                if ($originLat && $originLng && isset($flight['lat']) && isset($flight['lng'])) {
+                    $distToAirport = $this->haversine($originLat, $originLng, $flight['lat'], $flight['lng']);
+                    $flightGroundBreakdown = $this->calculateGroundCost($distToAirport, true);
+                    $flightGroundCost = $flightGroundBreakdown['total'];
+                    $flightCostBreakdown = $flightGroundBreakdown;
+                }
+
+                $flightAvg = round(($flight['min'] + $flight['max']) / 2, 2) + $flightGroundCost;
 
                 $comparison['flight'] = [
                     'airport'       => $flight['airport'],
                     'dest_airport'  => $flight['dest_airport'],
-                    'price_min'     => $flight['min'],
-                    'price_max'     => $flight['max'],
+                    'price_min'     => $flight['min'] + $flightGroundCost,
+                    'price_max'     => $flight['max'] + $flightGroundCost,
                     'price_avg'     => $flightAvg,
                     'duration_min'  => $flight['dur'],
                     'airline'       => $flight['airline'],
+                    'ground_cost'   => $flightGroundCost,
+                    'cost_breakdown'=> $flightCostBreakdown,
                 ];
 
                 if ($flightAvg < $ferryPriceAvg) {
@@ -286,6 +315,53 @@ class WeatherController extends Controller
         }
 
         return $comparisons;
+    }
+
+    private function haversine($lat1, $lon1, $lat2, $lon2): float
+    {
+        $r = 6371; // Earth's radius in km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        $a = sin($dLat/2) * sin($dLat/2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon/2) * sin($dLon/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        return $r * $c;
+    }
+
+    private function calculateGroundCost($distKm, $isAirport = false): array
+    {
+        if ($distKm <= 0) {
+            return ['total' => 0, 'grab' => 0, 'toll' => 0, 'oil' => 0, 'bus' => 0, 'mode' => 'none'];
+        }
+        
+        // Match Python AI engine logic
+        if ($distKm < 30 || $isAirport) {
+            // Grab/Taxi detailed breakdown
+            $grabFare = round(5.00 + ($distKm * 0.85), 2);
+            $oil = round($distKm * 0.15, 2);
+            $toll = $distKm > 15 ? round($distKm * 0.10, 2) : 0.00;
+            $total = round($grabFare + $oil + $toll, 2);
+            return [
+                'total' => $total,
+                'grab' => $grabFare,
+                'toll' => $toll,
+                'oil' => $oil,
+                'bus' => 0,
+                'mode' => 'grab'
+            ];
+        } else {
+            // Express bus for long distance: RM 5.00 base + RM 0.09 per km
+            $busFare = round(5.00 + ($distKm * 0.09), 2);
+            return [
+                'total' => $busFare,
+                'grab' => 0,
+                'toll' => 0,
+                'oil' => 0,
+                'bus' => $busFare,
+                'mode' => 'bus'
+            ];
+        }
     }
 
     /**

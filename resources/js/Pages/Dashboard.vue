@@ -31,7 +31,7 @@
     const userLocation = ref(null)
     const selectedOrigin = ref(null)
     const selectedPort = ref(null)
-    const selectedOverlay = ref('wind_new') // Default layer
+    const selectedOverlay = ref(null) // Weather layers disabled
     
     // Results
     const geoAnalysisResult = ref(null)
@@ -714,40 +714,6 @@
                                     @marker-click="handleMapMarkerClick"
                                 />
                             </div>
-                            <!-- Map Weather Controls (Moved here) -->
-                            <div class="mt-4 flex flex-wrap gap-2 justify-center">
-                                <button 
-                                    @click="selectedOverlay = 'wind'"
-                                    class="px-4 py-1.5 rounded-full text-xs font-bold transition border"
-                                    :class="selectedOverlay === 'wind' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-                                >
-                                    🌪️ Wind
-                                </button>
-
-
-                                <button 
-                                    @click="selectedOverlay = 'clouds'"
-                                    class="px-4 py-1.5 rounded-full text-xs font-bold transition border"
-                                    :class="selectedOverlay === 'clouds' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-                                >
-                                    ☁️ Clouds
-                                </button>
-                                <button 
-                                    @click="selectedOverlay = 'precipitation'"
-                                    class="px-4 py-1.5 rounded-full text-xs font-bold transition border"
-                                    :class="selectedOverlay === 'precipitation' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-                                >
-                                    🌧️ Rain
-                                </button>
-                                <button 
-                                    @click="selectedOverlay = 'temp'"
-                                    class="px-4 py-1.5 rounded-full text-xs font-bold transition border"
-                                    :class="selectedOverlay === 'temp' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-                                >
-                                    🌡️ Temp
-                                </button>
-
-                            </div>
                             <p class="text-sm text-blue-600/60 mt-4 italic">
                                 * Blue dot represents your location. Click on
                                 any anchor icon to view real-time weather and
@@ -839,7 +805,7 @@
                             <div class="mt-6 flex justify-end">
                                 <a
                                     :href="
-                                        route('weather.show', selectedPort.id)
+                                        route('weather.show', { port: selectedPort.id, origin_lat: currentOrigin?.lat, origin_lng: currentOrigin?.lng })
                                     "
                                     class="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-xl hover:bg-indigo-700 transition transform hover:scale-105"
                                 >

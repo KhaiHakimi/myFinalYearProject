@@ -42,7 +42,6 @@ require __DIR__.'/auth.php';
 // Customer / Public Routes (Accessible by guests)
 Route::get('/schedules', [\App\Http\Controllers\ScheduleController::class, 'index'])->name('schedules.index');
 Route::post('/api/travel-windows', [\App\Http\Controllers\TravelWindowController::class, 'analyze'])->name('travel_windows.analyze');
-Route::post('/api/chatbot', [\App\Http\Controllers\ChatbotController::class, 'message'])->name('chatbot.message');
 Route::post('/api/recommend', [\App\Http\Controllers\RecommendationController::class, 'recommend'])->name('recommend');
 Route::get('/our-fleet', [\App\Http\Controllers\FerryController::class, 'publicIndex'])->name('ferries.public_index');
 Route::get('/our-fleet/{ferry}', [\App\Http\Controllers\FerryController::class, 'publicShow'])->name('ferries.public_show');

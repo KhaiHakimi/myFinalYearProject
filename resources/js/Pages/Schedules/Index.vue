@@ -1585,10 +1585,6 @@
         )
     })
 
-    const handleChatBooking = (scheduleId) => {
-        router.visit(route('schedules.index'))
-    }
-
     const groupedSchedulesCount = computed(() => {
         return Object.values(groupedByOperator.value).reduce(
             (acc, curr) => acc + curr.length,
@@ -1838,19 +1834,5 @@
         })
     }
 
-    onMounted(() => {
-        // Listen for booking URLs triggered by Chatbot across pages
-        const queryParams = new URLSearchParams(window.location.search);
-        const bookId = queryParams.get('book');
-        if (bookId) {
-            // Give time for the schedules to be computed
-            setTimeout(() => {
-                handleChatBooking(bookId);
-            }, 300);
-            
-            // Rewrite URL to remove ?book
-            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.pushState({path:newUrl},'',newUrl);
-        }
-    })
+
 </script>

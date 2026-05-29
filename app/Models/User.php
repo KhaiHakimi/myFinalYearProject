@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -23,6 +23,7 @@ class User extends Authenticatable
         'phone_number',
         'telegram_chat_id',
         'telegram_verification_code',
+        'email_verification_code',
         'password',
         'is_admin',
     ];
@@ -53,5 +54,13 @@ class User extends Authenticatable
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->email_verification_code = (string) random_int(100000, 999999);
+        $this->save();
+
+        $this->notify(new \App\Notifications\VerifyEmailCodeNotification());
     }
 }

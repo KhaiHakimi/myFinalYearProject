@@ -5,7 +5,6 @@
     import DropdownLink from '@/Components/DropdownLink.vue'
     import NavLink from '@/Components/NavLink.vue'
     import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
-    import Chatbot from '@/Components/Chatbot.vue'
     import { Link } from '@inertiajs/vue3'
 
     const showingNavigationDropdown = ref(false)
@@ -288,7 +287,5 @@
         <main class="relative z-10">
             <slot />
         </main>
-        
-        <Chatbot />
     </div>
 </template>

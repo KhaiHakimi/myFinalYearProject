@@ -9,6 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('schedules:generate-daily')->hourly();
+Schedule::command('weather:check-cancellations')->hourly();
 
 // Shared Hosting Queue Worker Strategy
 // Runs every minute, processes jobs for up to 50 seconds, then exits.

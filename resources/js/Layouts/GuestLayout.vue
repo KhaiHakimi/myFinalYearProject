@@ -6,8 +6,6 @@
     import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
     import Dropdown from '@/Components/Dropdown.vue'
     import DropdownLink from '@/Components/DropdownLink.vue'
-    import Chatbot from '@/Components/Chatbot.vue'
-
     const props = defineProps({
         fullWidth: {
             type: Boolean,
@@ -384,8 +382,6 @@
                 <slot />
             </main>
         </div>
-        
-        <Chatbot />
     </div>
 </template>
 
