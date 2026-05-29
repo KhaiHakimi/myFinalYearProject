@@ -204,7 +204,7 @@ def predict_cancellation(model, features: dict) -> dict:
         confidence                – float 0.0–1.0 (how sure the model is)
         risk_level                – 'Safe' | 'Caution' | 'High Risk'
         contributing_factors      – list of top reasons
-        model_source              – always 'RANDOM_FOREST_AI'
+        model_source              – always 'FerryCast AI'
     """
     row = np.array([[features.get(f, 0) for f in FEATURE_NAMES]])
     prob_array = model.predict_proba(row)
@@ -231,7 +231,7 @@ def predict_cancellation(model, features: dict) -> dict:
         "confidence":               round(confidence, 4),
         "risk_level":               risk_level,
         "contributing_factors":     factors,
-        "model_source":            "RANDOM_FOREST_AI",
+        "model_source":            "FerryCast AI",
     }
 
 

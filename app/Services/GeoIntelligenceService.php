@@ -66,7 +66,7 @@ class GeoIntelligenceService
                     'ai_prediction'             => $ai['prediction'] ?? 'Operational',
                     'ai_confidence'             => $ai['confidence'] ?? 0,
                     'contributing_factors'      => $ai['contributing_factors'] ?? [],
-                    'source'                    => 'RANDOM_FOREST_AI',
+                    'source'                    => 'FerryCast AI',
                 ];
             }
         } catch (\Exception $e) {

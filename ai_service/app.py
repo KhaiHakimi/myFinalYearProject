@@ -133,7 +133,7 @@ def predict_batch():
     return jsonify({
         "predictions": results,
         "total":       len(results),
-        "model":       "RANDOM_FOREST_AI",
+        "model":       "FerryCast AI",
     })
 
 
