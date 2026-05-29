@@ -335,33 +335,28 @@ class WeatherController extends Controller
             return ['total' => 0, 'grab' => 0, 'toll' => 0, 'oil' => 0, 'bus' => 0, 'mode' => 'none'];
         }
         
-        // Match Python AI engine logic
-        if ($distKm < 30 || $isAirport) {
-            // Grab/Taxi detailed breakdown
-            $grabFare = round(5.00 + ($distKm * 0.85), 2);
-            $oil = round($distKm * 0.15, 2);
-            $toll = $distKm > 15 ? round($distKm * 0.10, 2) : 0.00;
-            $total = round($grabFare + $oil + $toll, 2);
-            return [
-                'total' => $total,
-                'grab' => $grabFare,
-                'toll' => $toll,
-                'oil' => $oil,
-                'bus' => 0,
-                'mode' => 'grab'
-            ];
-        } else {
-            // Express bus for long distance: RM 5.00 base + RM 0.09 per km
-            $busFare = round(5.00 + ($distKm * 0.09), 2);
-            return [
-                'total' => $busFare,
-                'grab' => 0,
-                'toll' => 0,
-                'oil' => 0,
-                'bus' => $busFare,
-                'mode' => 'bus'
-            ];
-        }
+        $grabFare = round(5.00 + ($distKm * 0.85), 2);
+        $oil = round($distKm * 0.15, 2);
+        $toll = $distKm > 15 ? round($distKm * 0.10, 2) : 0.00;
+        $drivingCost = round($oil + $toll, 2);
+        $busFare = round(5.00 + ($distKm * 0.09), 2);
+
+        // Find cheapest mode to use as the total ground cost
+        $minCost = min($grabFare, $drivingCost, $busFare);
+        
+        $mode = 'grab';
+        if ($minCost == $busFare) $mode = 'bus';
+        elseif ($minCost == $drivingCost) $mode = 'drive';
+
+        return [
+            'total' => $minCost,
+            'grab' => $grabFare,
+            'toll' => $toll,
+            'oil' => $oil,
+            'drive' => $drivingCost,
+            'bus' => $busFare,
+            'mode' => $mode
+        ];
     }
 
     /**

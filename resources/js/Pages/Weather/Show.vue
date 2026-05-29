@@ -321,13 +321,19 @@
                                                                     </div>
                                                                 </summary>
                                                                 <div class="p-2 border-t border-gray-100 bg-white">
-                                                                    <ul v-if="comp.ferry.cost_breakdown.mode === 'grab'" class="space-y-1">
-                                                                        <li class="flex justify-between"><span>Grab (Base + Dist):</span> <span class="font-bold">RM {{ comp.ferry.cost_breakdown.grab.toFixed(2) }}</span></li>
-                                                                        <li class="flex justify-between"><span>Estimated Tolls:</span> <span class="font-bold">RM {{ comp.ferry.cost_breakdown.toll.toFixed(2) }}</span></li>
-                                                                        <li class="flex justify-between"><span>Estimated Fuel:</span> <span class="font-bold">RM {{ comp.ferry.cost_breakdown.oil.toFixed(2) }}</span></li>
-                                                                    </ul>
-                                                                    <ul v-else class="space-y-1">
-                                                                        <li class="flex justify-between"><span>Express Bus Fare:</span> <span class="font-bold">RM {{ comp.ferry.cost_breakdown.bus.toFixed(2) }}</span></li>
+                                                                    <ul class="space-y-1 text-xs">
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.ferry.cost_breakdown.mode === 'grab'}">
+                                                                            <span>Grab (Base + Dist):</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.ferry.cost_breakdown.grab.toFixed(2) }}</span>
+                                                                        </li>
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.ferry.cost_breakdown.mode === 'drive'}">
+                                                                            <span>Drive (Tolls + Fuel):</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.ferry.cost_breakdown.drive.toFixed(2) }}</span>
+                                                                        </li>
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.ferry.cost_breakdown.mode === 'bus'}">
+                                                                            <span>Express Bus Fare:</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.ferry.cost_breakdown.bus.toFixed(2) }}</span>
+                                                                        </li>
                                                                     </ul>
                                                                 </div>
                                                             </details>
@@ -357,13 +363,19 @@
                                                                     </div>
                                                                 </summary>
                                                                 <div class="p-2 border-t border-gray-100 bg-white">
-                                                                    <ul v-if="comp.flight.cost_breakdown.mode === 'grab'" class="space-y-1">
-                                                                        <li class="flex justify-between"><span>Grab (Base + Dist):</span> <span class="font-bold">RM {{ comp.flight.cost_breakdown.grab.toFixed(2) }}</span></li>
-                                                                        <li class="flex justify-between"><span>Estimated Tolls:</span> <span class="font-bold">RM {{ comp.flight.cost_breakdown.toll.toFixed(2) }}</span></li>
-                                                                        <li class="flex justify-between"><span>Estimated Fuel:</span> <span class="font-bold">RM {{ comp.flight.cost_breakdown.oil.toFixed(2) }}</span></li>
-                                                                    </ul>
-                                                                    <ul v-else class="space-y-1">
-                                                                        <li class="flex justify-between"><span>Express Bus Fare:</span> <span class="font-bold">RM {{ comp.flight.cost_breakdown.bus.toFixed(2) }}</span></li>
+                                                                    <ul class="space-y-1 text-xs">
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.flight.cost_breakdown.mode === 'grab'}">
+                                                                            <span>Grab (Base + Dist):</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.flight.cost_breakdown.grab.toFixed(2) }}</span>
+                                                                        </li>
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.flight.cost_breakdown.mode === 'drive'}">
+                                                                            <span>Drive (Tolls + Fuel):</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.flight.cost_breakdown.drive.toFixed(2) }}</span>
+                                                                        </li>
+                                                                        <li class="flex justify-between items-center" :class="{'text-emerald-600 font-bold bg-emerald-50 p-1 rounded': comp.flight.cost_breakdown.mode === 'bus'}">
+                                                                            <span>Express Bus Fare:</span> 
+                                                                            <span class="font-black text-right">RM {{ comp.flight.cost_breakdown.bus.toFixed(2) }}</span>
+                                                                        </li>
                                                                     </ul>
                                                                 </div>
                                                             </details>

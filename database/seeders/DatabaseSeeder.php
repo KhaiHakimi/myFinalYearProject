@@ -17,18 +17,18 @@ class DatabaseSeeder extends Seeder
     {
         // Create Admin User
         User::updateOrCreate(
-            ['email' => 'admin@ferrycast.com'],
+            ['email' => 'admin@ferrycast.space'],
             [
-                'name' => 'Ferry Admin',
-                'password' => bcrypt('password'),
+                'name' => 'Admin User',
+                'password' => Hash::make('password'),
                 'is_admin' => true,
-                'phone_number' => '0123456789',
+                'email_verified_at' => now(),
             ]
         );
 
         // Create Regular Customer
-        User::updateOrCreate(
-            ['email' => 'customer@ferrycast.com'],
+        User::firstOrCreate(
+            ['email' => 'customer@ferrycast.space'],
             [
                 'name' => 'Ferry Customer',
                 'password' => bcrypt('password'),
