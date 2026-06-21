@@ -52,7 +52,6 @@ class CheckWeatherCancellations extends Command
             // Analyze route viability
             $routeRisk = $geoIntelligence->analyzeRouteViability($schedule->origin, $schedule->destination);
             
-            // If the route risk score is >= 85, or max wave height > 2.5m, we cancel
             if ($routeRisk['route_risk_score'] >= 85 || $routeRisk['max_wave_height'] > 2.5) {
                 $this->warn("Schedule {$schedule->id} exceeded risk threshold (Score: {$routeRisk['route_risk_score']}). Cancelling...");
 
@@ -64,15 +63,27 @@ class CheckWeatherCancellations extends Command
                 
                 foreach ($paidBookings as $booking) {
                     try {
+                        // 2a. Issue Stripe Refund if payment intent exists
+                        if (!empty($booking->stripe_payment_intent) && !str_starts_with($booking->stripe_payment_intent, 'pi_dummy')) {
+                            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                            \Stripe\Refund::create([
+                                'payment_intent' => $booking->stripe_payment_intent,
+                            ]);
+                            $this->info("Issued Stripe refund for Booking Ref: {$booking->booking_reference}");
+                        } else {
+                            $this->info("Skipped real Stripe refund for dummy/missing payment intent on Booking Ref: {$booking->booking_reference}");
+                        }
+
+                        // 2b. Send cancellation email
                         Mail::to($booking->passenger_email)->send(new TicketCancelledDueToWeather($booking, $schedule));
                         
-                        // Mark booking as refunded (or pending refund depending on actual Stripe integration)
+                        // 2c. Mark booking as refunded
                         $booking->update(['payment_status' => 'refunded']);
                         
                         $this->info("Sent cancellation email to {$booking->passenger_email} (Booking Ref: {$booking->booking_reference})");
                     } catch (\Exception $e) {
-                        Log::error("Failed to send cancellation email to {$booking->passenger_email}: " . $e->getMessage());
-                        $this->error("Failed to send cancellation email to {$booking->passenger_email}.");
+                        Log::error("Failed to process refund/email for {$booking->passenger_email}: " . $e->getMessage());
+                        $this->error("Failed to process refund/email for {$booking->passenger_email}. Error: " . $e->getMessage());
                     }
                 }
             } else {

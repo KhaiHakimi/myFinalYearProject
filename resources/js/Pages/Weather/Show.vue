@@ -258,20 +258,20 @@
                                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                                                 <div>
                                                     <div class="flex items-center gap-2 mb-1">
-                                                        <span v-if="idx === 0" class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600 text-white">Best Alternative</span>
-                                                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full" :class="alt.risk_color === 'green' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'">{{ alt.risk_status }}</span>
+                                                        <span v-if="idx === 0" class="text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-600 text-white">Best Alternative</span>
+                                                        <span class="text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full" :class="alt.risk_color === 'green' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'">{{ alt.risk_status }}</span>
                                                     </div>
-                                                    <h5 class="text-lg font-black text-blue-900">🚢 {{ alt.port.name }}</h5>
-                                                    <p class="text-xs text-gray-500">{{ alt.port.location }}</p>
+                                                    <h5 class="text-xl font-black text-blue-900">🚢 {{ alt.port.name }}</h5>
+                                                    <p class="text-sm text-gray-500">{{ alt.port.location }}</p>
                                                     <div class="flex flex-wrap gap-1 mt-1">
-                                                        <span v-for="dest in alt.destinations" :key="dest" class="text-[9px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">→ {{ dest }}</span>
+                                                        <span v-for="dest in alt.destinations" :key="dest" class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">→ {{ dest }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="text-right flex-shrink-0">
-                                                    <div class="text-xs text-gray-400 font-bold uppercase tracking-widest">From</div>
-                                                    <div class="text-xl font-black text-emerald-600">RM {{ alt.cheapest_price }}</div>
-                                                    <div class="text-[10px] text-gray-400">{{ alt.schedule_count }} departures</div>
-                                                    <a :href="route('weather.show', alt.port.id)" class="mt-2 inline-block bg-emerald-600 text-white font-black uppercase text-[9px] tracking-widest px-5 py-2 rounded-xl hover:bg-emerald-700 transition shadow-md">View Safe Route →</a>
+                                                    <div class="text-sm text-gray-400 font-bold uppercase tracking-widest">From</div>
+                                                    <div class="text-2xl font-black text-emerald-600">RM {{ alt.cheapest_price }}</div>
+                                                    <div class="text-sm text-gray-400">{{ alt.schedule_count }} departures</div>
+                                                    <a :href="route('weather.show', alt.port.id)" class="mt-2 inline-block bg-emerald-600 text-white font-black uppercase text-xs tracking-widest px-5 py-2 rounded-xl hover:bg-emerald-700 transition shadow-md">View Safe Route →</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -285,7 +285,7 @@
                                     <h4 class="text-xs font-black text-blue-900 uppercase tracking-widest flex items-center gap-2">
                                         <span class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center text-sm">⚖️</span> Ferry vs Flight Total Fare Comparison
                                     </h4>
-                                    <span class="text-[9px] font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                    <span class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
                                         * Includes estimated ground transport
                                     </span>
                                 </div>
@@ -293,31 +293,31 @@
                                     <div v-for="(comp, ci) in transport_comparisons" :key="'comp-'+ci" class="border-2 rounded-2xl overflow-hidden" :class="comp.recommendation === 'flight' && isHighRisk ? 'border-rose-300 bg-rose-50/20' : 'border-blue-100 bg-white'">
                                         <div class="px-5 py-2.5 flex items-center justify-between" :class="comp.recommendation === 'flight' && isHighRisk ? 'bg-rose-100/50' : 'bg-blue-50/50'">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-base">🏝️</span>
-                                                <span class="font-black text-blue-900 text-sm">{{ comp.destination?.name }}</span>
-                                                <span v-if="comp.is_only_route" class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">Only Route</span>
+                                                <span class="text-xl">🏝️</span>
+                                                <span class="font-black text-blue-900 text-lg">{{ comp.destination?.name }}</span>
+                                                <span v-if="comp.is_only_route" class="text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">Only Route</span>
                                             </div>
-                                            <span v-if="comp.flight" class="text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full" :class="comp.recommendation === 'flight' ? 'bg-sky-600 text-white' : comp.recommendation === 'ferry' ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'">{{ comp.recommendation === 'flight' ? '✈️ AI: Fly Instead' : comp.recommendation === 'ferry' ? '🚢 AI: Ferry Recommended' : '🛡️ AI: Try Other Jetty' }}</span>
+                                            <span v-if="comp.flight" class="text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full" :class="comp.recommendation === 'flight' ? 'bg-sky-600 text-white' : comp.recommendation === 'ferry' ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'">{{ comp.recommendation === 'flight' ? '✈️ AI: Fly Instead' : comp.recommendation === 'ferry' ? '🚢 AI: Ferry Recommended' : '🛡️ AI: Try Other Jetty' }}</span>
                                         </div>
                                         <div class="p-5">
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="rounded-xl p-4 border-2" :class="comp.cheaper === 'ferry' && !isHighRisk ? 'border-emerald-400 bg-emerald-50/30' : isHighRisk ? 'border-rose-200 bg-rose-50/20' : 'border-gray-200 bg-gray-50/30'">
                                                     <div class="flex items-center justify-between mb-3">
                                                         <div class="flex items-center gap-2">
-                                                            <span class="text-xl">🚢</span><span class="font-black text-blue-900 uppercase text-xs tracking-wide">Ferry</span>
+                                                            <span class="text-2xl">🚢</span><span class="font-black text-blue-900 uppercase text-sm tracking-wide">Ferry</span>
                                                         </div>
-                                                        <span v-if="comp.cheaper === 'ferry' && !isHighRisk" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">Cheaper</span>
-                                                        <span v-if="isHighRisk" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-rose-500 text-white">{{ risk_analysis.status }}</span>
+                                                        <span v-if="comp.cheaper === 'ferry' && !isHighRisk" class="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">Cheaper</span>
+                                                        <span v-if="isHighRisk" class="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-rose-500 text-white">{{ risk_analysis.status }}</span>
                                                     </div>
-                                                    <div class="space-y-1.5 text-xs">
+                                                    <div class="space-y-1.5 text-sm">
                                                         <div class="flex flex-col gap-1">
                                                             <div class="flex justify-between"><span class="text-gray-500">Price</span><span class="font-black text-blue-900">RM {{ comp.ferry.price_min?.toFixed(2) }}<span v-if="comp.ferry.price_min !== comp.ferry.price_max" class="text-gray-400 font-normal"> — {{ comp.ferry.price_max?.toFixed(2) }}</span></span></div>
-                                                            <details v-if="comp.ferry.ground_cost > 0" class="group text-[10px] text-gray-500 bg-white/50 rounded border border-gray-100 overflow-hidden w-full">
+                                                            <details v-if="comp.ferry.ground_cost > 0" class="group text-xs text-gray-500 bg-white/50 rounded border border-gray-100 overflow-hidden w-full">
                                                                 <summary class="cursor-pointer p-1.5 flex justify-between items-center hover:bg-gray-50 transition-colors list-none font-bold">
                                                                     <span>Ground Fare Details</span>
                                                                     <div class="flex items-center gap-1">
                                                                         <span class="text-gray-700">RM {{ comp.ferry.ground_cost.toFixed(2) }}</span>
-                                                                        <svg class="w-3 h-3 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                                        <svg class="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                                                     </div>
                                                                 </summary>
                                                                 <div class="p-2 border-t border-gray-100 bg-white">
@@ -331,11 +331,11 @@
                                                                                 <span>Drive (Tolls & Fuel):</span> 
                                                                                 <span class="font-black text-right">RM {{ comp.ferry.cost_breakdown.drive.toFixed(2) }}</span>
                                                                             </div>
-                                                                            <div class="flex justify-between items-center text-[10px] pl-2 opacity-80">
+                                                                            <div class="flex justify-between items-center text-xs pl-2 opacity-80">
                                                                                 <span>↳ Tolls</span> 
                                                                                 <span>RM {{ comp.ferry.cost_breakdown.toll.toFixed(2) }}</span>
                                                                             </div>
-                                                                            <div class="flex justify-between items-center text-[10px] pl-2 opacity-80">
+                                                                            <div class="flex justify-between items-center text-xs pl-2 opacity-80">
                                                                                 <span>↳ Fuel</span> 
                                                                                 <span>RM {{ comp.ferry.cost_breakdown.oil.toFixed(2) }}</span>
                                                                             </div>
@@ -356,20 +356,20 @@
                                                 <div v-if="comp.flight" class="rounded-xl p-4 border-2" :class="comp.cheaper === 'flight' || (isHighRisk && comp.is_only_route) ? 'border-sky-400 bg-sky-50/30' : 'border-gray-200 bg-gray-50/30'">
                                                     <div class="flex items-center justify-between mb-3">
                                                         <div class="flex items-center gap-2">
-                                                            <span class="text-xl">✈️</span><span class="font-black text-blue-900 uppercase text-xs tracking-wide">Flight</span>
+                                                            <span class="text-2xl">✈️</span><span class="font-black text-blue-900 uppercase text-sm tracking-wide">Flight</span>
                                                         </div>
-                                                        <span v-if="comp.cheaper === 'flight'" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-sky-600 text-white">Cheaper</span>
-                                                        <span v-else-if="isHighRisk && comp.is_only_route" class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">Safe Alternative</span>
+                                                        <span v-if="comp.cheaper === 'flight'" class="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-sky-600 text-white">Cheaper</span>
+                                                        <span v-else-if="isHighRisk && comp.is_only_route" class="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">Safe Alternative</span>
                                                     </div>
-                                                    <div class="space-y-1.5 text-xs">
+                                                    <div class="space-y-1.5 text-sm">
                                                         <div class="flex flex-col gap-1">
                                                             <div class="flex justify-between"><span class="text-gray-500">Price</span><span class="font-black text-blue-900">RM {{ Number(comp.flight.price_min).toFixed(2) }}<span v-if="comp.flight.price_min !== comp.flight.price_max" class="text-gray-400 font-normal"> — {{ Number(comp.flight.price_max).toFixed(2) }}</span></span></div>
-                                                            <details v-if="comp.flight.ground_cost > 0" class="group text-[10px] text-gray-500 bg-white/50 rounded border border-gray-100 overflow-hidden w-full">
+                                                            <details v-if="comp.flight.ground_cost > 0" class="group text-xs text-gray-500 bg-white/50 rounded border border-gray-100 overflow-hidden w-full">
                                                                 <summary class="cursor-pointer p-1.5 flex justify-between items-center hover:bg-gray-50 transition-colors list-none font-bold">
                                                                     <span>Ground Fare Details</span>
                                                                     <div class="flex items-center gap-1">
                                                                         <span class="text-gray-700">RM {{ comp.flight.ground_cost.toFixed(2) }}</span>
-                                                                        <svg class="w-3 h-3 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                                        <svg class="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                                                     </div>
                                                                 </summary>
                                                                 <div class="p-2 border-t border-gray-100 bg-white">
@@ -383,11 +383,11 @@
                                                                                 <span>Drive (Tolls & Fuel):</span> 
                                                                                 <span class="font-black text-right">RM {{ comp.flight.cost_breakdown.drive.toFixed(2) }}</span>
                                                                             </div>
-                                                                            <div class="flex justify-between items-center text-[10px] pl-2 opacity-80">
+                                                                            <div class="flex justify-between items-center text-xs pl-2 opacity-80">
                                                                                 <span>↳ Tolls</span> 
                                                                                 <span>RM {{ comp.flight.cost_breakdown.toll.toFixed(2) }}</span>
                                                                             </div>
-                                                                            <div class="flex justify-between items-center text-[10px] pl-2 opacity-80">
+                                                                            <div class="flex justify-between items-center text-xs pl-2 opacity-80">
                                                                                 <span>↳ Fuel</span> 
                                                                                 <span>RM {{ comp.flight.cost_breakdown.oil.toFixed(2) }}</span>
                                                                             </div>
@@ -402,17 +402,17 @@
                                                         </div>
                                                         <div class="flex justify-between"><span class="text-gray-500">Duration</span><span class="font-bold text-blue-900">{{ formatDuration(comp.flight.duration_min) }}</span></div>
                                                         <div class="flex justify-between"><span class="text-gray-500">Airline</span><span class="font-bold text-blue-900">{{ comp.flight.airline }}</span></div>
-                                                        <div class="flex justify-between"><span class="text-gray-500">Route</span><span class="font-bold text-blue-900 text-[10px]">{{ comp.flight.airport }} → {{ comp.flight.dest_airport }}</span></div>
+                                                        <div class="flex justify-between"><span class="text-gray-500">Route</span><span class="font-bold text-blue-900 text-xs">{{ comp.flight.airport }} → {{ comp.flight.dest_airport }}</span></div>
                                                     </div>
                                                 </div>
                                                 <div v-else class="rounded-xl p-4 border-2 border-dashed border-gray-200 bg-gray-50/30 flex flex-col items-center justify-center text-center">
-                                                    <span class="text-2xl mb-1 opacity-30">✈️</span>
-                                                    <p class="text-xs font-bold text-gray-400">No direct flight route</p>
-                                                    <p class="text-[10px] text-gray-300">Ferry is the primary transport</p>
+                                                    <span class="text-3xl mb-1 opacity-30">✈️</span>
+                                                    <p class="text-sm font-bold text-gray-400">No direct flight route</p>
+                                                    <p class="text-xs text-gray-300">Ferry is the primary transport</p>
                                                 </div>
                                             </div>
-                                            <div v-if="comp.flight && comp.savings > 0" class="mt-3 rounded-lg p-2.5 flex items-center justify-center gap-2 text-xs font-bold" :class="comp.cheaper === 'ferry' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-sky-50 text-sky-700 border border-sky-200'">
-                                                <span>{{ comp.cheaper === 'ferry' ? '🚢' : '✈️' }}</span>
+                                            <div v-if="comp.flight && comp.savings > 0" class="mt-3 rounded-lg p-2.5 flex items-center justify-center gap-2 text-sm font-bold" :class="comp.cheaper === 'ferry' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-sky-50 text-sky-700 border border-sky-200'">
+                                                <span class="text-lg">{{ comp.cheaper === 'ferry' ? '🚢' : '✈️' }}</span>
                                                 <span>{{ comp.cheaper === 'ferry' ? 'Ferry' : 'Flight' }} saves you ~<strong>RM {{ comp.savings?.toFixed(2) }}</strong> on average</span>
                                             </div>
                                         </div>
