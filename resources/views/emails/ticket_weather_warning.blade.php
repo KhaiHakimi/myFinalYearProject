@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Urgent: Your Ferry Booking has been Cancelled Due to Weather</title>
+    <title>Weather Advisory: Important Information About Your Trip</title>
     <style>
         body { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
         .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 60px; padding-top: 40px;}
@@ -35,8 +35,8 @@
         .content { padding: 40px; line-height: 1.6; font-size: 16px; }
         .greeting { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 20px; margin-top: 0;}
         
-        .alert-box { background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px 20px; margin-bottom: 25px; border-radius: 0 6px 6px 0; }
-        .alert-text { color: #991b1b; margin: 0; font-weight: 500; font-size: 15px; }
+        .alert-box { background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px 20px; margin-bottom: 25px; border-radius: 0 6px 6px 0; }
+        .alert-text { color: #b45309; margin: 0; font-weight: 500; font-size: 15px; }
         
         .details-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
         .details-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; margin-top: 0; margin-bottom: 15px; }
@@ -45,11 +45,9 @@
         .label { font-weight: 500; color: #64748b; font-size: 15px;}
         .value { font-weight: 600; color: #0f172a; font-size: 15px; text-align: right;}
         
-        .refund-info { font-size: 15px; color: #334155; background: #f1f5f9; padding: 20px; border-radius: 8px;}
-        
-        .btn-container { text-align: center; margin-top: 35px; margin-bottom: 10px; }
-        .btn { display: inline-block; background-color: #0284c7; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.2); }
-        .btn:hover { background-color: #0369a1; }
+        .info-list { font-size: 15px; color: #334155; margin-bottom: 20px;}
+        .info-list ul { padding-left: 20px; margin-top: 10px; }
+        .info-list li { margin-bottom: 8px; }
         
         .footer { background-color: #ffffff; padding: 30px 40px; text-align: center; font-size: 13px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
         .footer p { margin: 5px 0; }
@@ -77,10 +75,10 @@
                 <p class="greeting">Hi {{ $booking->passenger_name }},</p>
                 
                 <div class="alert-box">
-                    <p class="alert-text"><strong>Urgent Update:</strong> Your upcoming ferry departure has been automatically cancelled due to severe weather conditions.</p>
+                    <p class="alert-text"><strong>Weather Advisory:</strong> We are closely monitoring weather conditions for your upcoming trip. Your trip is not cancelled yet.</p>
                 </div>
 
-                <p>At FerryCast, your safety is our top priority. Our marine intelligence system has flagged your route as hazardous for travel (e.g., high waves or strong winds).</p>
+                <p>Current marine forecasts indicate that there may be high winds or rough seas at the time of your departure. We wanted to give you an early heads-up.</p>
                 
                 <div class="details-box">
                     <h3 class="details-title">Trip Details</h3>
@@ -96,20 +94,19 @@
                         <span class="label">Departure</span>
                         <span class="value">{{ $schedule->departure_time->format('d M Y, h:i A') }}</span>
                     </div>
-                    <div class="details-row">
-                        <span class="label">Tickets</span>
-                        <span class="value">{{ $booking->quantity }}</span>
-                    </div>
                 </div>
 
-                <div class="refund-info">
-                    <strong>Refund Processed</strong><br><br>
-                    Your payment of <strong>{{ $booking->currency }} {{ number_format($booking->total_amount, 2) }}</strong> has been fully refunded. Depending on your bank, it may take 5-10 business days for the funds to appear in your account.
+                <div class="info-list">
+                    <strong>What you need to know:</strong>
+                    <ul>
+                        <li>Your trip is <strong>not cancelled yet</strong>.</li>
+                        <li>We will continue to monitor the forecast.</li>
+                        <li>A final safety decision will be made and communicated to you <strong>12 hours</strong> before your scheduled departure.</li>
+                        <li>If your trip is cancelled, you will automatically receive a full refund.</li>
+                    </ul>
                 </div>
-
-                <div class="btn-container">
-                    <a href="{{ url('/') }}" class="btn">Book a Rescheduled Trip</a>
-                </div>
+                
+                <p>We advise you to keep an eye on your email for further updates.</p>
             </div>
             
             <div class="footer">

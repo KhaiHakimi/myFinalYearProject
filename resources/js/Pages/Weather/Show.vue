@@ -438,7 +438,7 @@
                                 <p class="text-xs text-gray-500 font-medium">Select a date to view available departures and book your ferry ticket</p>
                             </div>
                             <div class="flex items-center gap-3 relative z-10 pointer-events-auto">
-                                <input type="date" v-model="travelDate" class="rounded-full border-gray-200 text-sm font-bold text-blue-900 focus:ring-blue-500" :min="new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0]" :max="new Date().toISOString().split('T')[0]">
+                                <input type="date" v-model="travelDate" class="rounded-full border-gray-200 text-sm font-bold text-blue-900 focus:ring-blue-500" :max="new Date(new Date().setDate(new Date().getDate() + 90)).toISOString().split('T')[0]">
                                 <button @click="filterByDate" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition shadow-md">Filter</button>
                             </div>
                         </div>
@@ -486,10 +486,9 @@
                                             </span>
                                         </td>
                                         <td class="p-4 pr-8 text-right relative z-10 pointer-events-auto">
-                                            <button @click="openBookingModal(schedule)" :disabled="getScheduleStatus(schedule) !== 'upcoming'"
-                                                class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                                                :class="getScheduleStatus(schedule) === 'upcoming' ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5' : 'bg-gray-100 text-gray-400 cursor-not-allowed'">
-                                                {{ getScheduleStatus(schedule) === 'upcoming' ? 'Book Now' : 'Closed' }}
+                                            <button @click="openBookingModal(schedule)"
+                                                class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                                                Book Now
                                             </button>
                                         </td>
                                     </tr>

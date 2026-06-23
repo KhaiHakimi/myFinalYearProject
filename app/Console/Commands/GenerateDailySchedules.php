@@ -79,9 +79,9 @@ class GenerateDailySchedules extends Command
             return;
         }
 
-        // Generate for Yesterday + Today + Next 12 Days (14 days total)
+        // Generate for Yesterday + Today + Next 88 Days (90 days total)
         // This ensures that if the command was missed yesterday, it catches up.
-        $daysToGenerate = 14;
+        $daysToGenerate = 90;
         $totalCreated = 0;
 
         for ($i = -1; $i < ($daysToGenerate - 1); $i++) {

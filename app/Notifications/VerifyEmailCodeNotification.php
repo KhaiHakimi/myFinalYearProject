@@ -35,10 +35,10 @@ class VerifyEmailCodeNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Your Ferrycast Verification Code')
-            ->line('Thank you for registering with Ferrycast! Please use the following code to verify your email address.')
-            ->line('Your verification code is: **' . $notifiable->email_verification_code . '**')
-            ->line('If you did not create an account, no further action is required.');
+            ->subject('Your FerryCast Verification Code')
+            ->view('emails.verify_code', [
+                'code' => $notifiable->email_verification_code
+            ]);
     }
 
     /**

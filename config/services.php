@@ -35,12 +35,6 @@ return [
         ],
     ],
 
-    'telegram' => [
-        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
-        'chat_id' => env('TELEGRAM_CHAT_ID'),
-        'bot_username' => env('TELEGRAM_BOT_USERNAME', 'FerCasterBot'),
-    ],
-
     'stripe' => [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),

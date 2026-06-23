@@ -593,60 +593,7 @@
                     </div>
                 </div>
 
-                <!-- AI Geo-Intelligence Recommendation -->
-                <div v-if="geoAnalysisResult" class="overflow-hidden bg-white shadow-xl sm:rounded-2xl border-l-8 animate-fade-in-down"
-                    :class="{
-                        'border-emerald-500': geoAnalysisResult.recommendation?.type === 'success',
-                        'border-amber-500': geoAnalysisResult.recommendation?.type === 'warning',
-                        'border-rose-500': geoAnalysisResult.recommendation?.type === 'danger'
-                    }"
-                >
-                    <div class="p-8">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-                             <span class="text-3xl">🤖</span> FerryCast AI Recommendation
-                        </h3>
-                        <div v-if="geoAnalysisResult.recommendation">
-                            <p class="text-lg text-gray-700" v-html="geoAnalysisResult.recommendation.message"></p>
-                            
-                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Nearest Port Card -->
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200" v-if="geoAnalysisResult.nearest_any_port">
-                                   <div class="text-xs font-bold uppercase text-gray-400">Nearest Physical Jetty</div>
-                                   <div class="font-bold text-xl">{{ geoAnalysisResult.nearest_any_port.port.name }}</div>
-                                   <div class="text-sm">
-                                        {{ geoAnalysisResult.nearest_any_port.distance.toFixed(1) }} km away
-                                        <span class="font-bold" :class="{
-                                            'text-emerald-600': geoAnalysisResult.nearest_any_port.is_safe,
-                                            'text-rose-600': !geoAnalysisResult.nearest_any_port.is_safe
-                                        }">
-                                            ({{ geoAnalysisResult.nearest_any_port.risk_status }})
-                                        </span>
-                                   </div>
-                                   <Link :href="route('schedules.index', { origin_port_id: geoAnalysisResult.nearest_any_port.port.id })" 
-                                         class="mt-3 inline-block px-4 py-2 bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-widest rounded shadow hover:bg-gray-300 transition w-full text-center">
-                                         View Schedules Here
-                                   </Link>
-                                </div>
 
-                                <!-- Recommended Port Card -->
-                                <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200" v-if="geoAnalysisResult.nearest_safe_port">
-                                   <div class="text-xs font-bold uppercase text-emerald-600">Best Safe Option</div>
-                                   <div class="font-bold text-xl text-emerald-900">{{ geoAnalysisResult.nearest_safe_port.port.name }}</div>
-                                   <div class="text-sm text-emerald-700">
-                                        {{ geoAnalysisResult.nearest_safe_port.distance.toFixed(1) }} km away
-                                        <span class="font-bold">
-                                            ({{ geoAnalysisResult.nearest_safe_port.risk_status }})
-                                        </span>
-                                   </div>
-                                   <Link :href="route('schedules.index', { origin_port_id: geoAnalysisResult.nearest_safe_port.port.id })" 
-                                         class="mt-3 inline-block px-4 py-2 bg-emerald-600 text-white font-bold text-xs uppercase tracking-widest rounded shadow hover:bg-emerald-700 transition w-full text-center">
-                                         Book Safe Route
-                                   </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Map Section -->
                 <div

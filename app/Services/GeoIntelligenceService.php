@@ -191,7 +191,7 @@ class GeoIntelligenceService
      * Scan mid-sea waypoints between two ports to detect rough conditions
      * that wouldn't show up in port-level readings alone.
      */
-    public function analyzeRouteViability(Port $origin, Port $destination): array
+    public function analyzeRouteViability(Port $origin, Port $destination, \Carbon\Carbon $targetTime = null): array
     {
         $waypoints = $this->interpolateWaypoints(
             $origin->latitude, $origin->longitude,
@@ -205,7 +205,7 @@ class GeoIntelligenceService
         $checkpoints   = [];
 
         foreach ($waypoints as $point) {
-            $forecast = $this->weatherService->getMarineForecast($point['lat'], $point['lng']);
+            $forecast = $this->weatherService->getMarineForecast($point['lat'], $point['lng'], $targetTime);
 
             if (! $forecast) {
                 continue;

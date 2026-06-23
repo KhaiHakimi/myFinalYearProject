@@ -21,8 +21,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'phone_number',
-        'telegram_chat_id',
-        'telegram_verification_code',
         'email_verification_code',
         'password',
         'is_admin',

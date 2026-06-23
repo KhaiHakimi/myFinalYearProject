@@ -34,56 +34,76 @@ class CheckWeatherCancellations extends Command
     {
         $this->info("Starting weather cancellation check...");
 
-        // Get schedules departing in the next 24 hours that are not yet cancelled or departed
-        $schedules = Schedule::whereIn('status', ['open', 'full'])
-            ->where('departure_time', '>=', now())
+        // 1. ADVANCE WARNINGS (12 - 24 hours out)
+        $this->info("Checking for advance warnings (12-24 hours)...");
+        $warningSchedules = Schedule::whereIn('status', ['open', 'full'])
+            ->where('weather_warning_sent', false)
+            ->where('departure_time', '>', now()->addHours(12))
             ->where('departure_time', '<=', now()->addHours(24))
             ->with(['origin', 'destination', 'bookings'])
             ->get();
 
-        if ($schedules->isEmpty()) {
+        foreach ($warningSchedules as $schedule) {
+            $routeRisk = $geoIntelligence->analyzeRouteViability($schedule->origin, $schedule->destination, $schedule->departure_time);
+            
+            if ($routeRisk['route_risk_score'] >= 85 || $routeRisk['max_wave_height'] > 2.5) {
+                $this->warn("Schedule {$schedule->id} at risk (Score: {$routeRisk['route_risk_score']}). Sending warnings...");
+                
+                $paidBookings = $schedule->bookings->where('payment_status', 'paid');
+                foreach ($paidBookings as $booking) {
+                    try {
+                        Mail::to($booking->passenger_email)->send(new \App\Mail\TicketWeatherWarning($booking, $schedule));
+                    } catch (\Exception $e) {
+                        Log::error("Failed to send warning email for {$booking->passenger_email}: " . $e->getMessage());
+                    }
+                }
+                
+                $schedule->update(['weather_warning_sent' => true]);
+            }
+        }
+
+        // 2. FINAL CANCELLATIONS (0 - 12 hours out)
+        $this->info("Checking for final cancellations (0-12 hours)...");
+        $cancelSchedules = Schedule::whereIn('status', ['open', 'full'])
+            ->where('departure_time', '>=', now())
+            ->where('departure_time', '<=', now()->addHours(12))
+            ->with(['origin', 'destination', 'bookings'])
+            ->get();
+
+        if ($cancelSchedules->isEmpty() && $warningSchedules->isEmpty()) {
             $this->info("No upcoming schedules to check.");
             return;
         }
 
-        foreach ($schedules as $schedule) {
+        foreach ($cancelSchedules as $schedule) {
             $this->info("Checking schedule {$schedule->id} ({$schedule->origin->name} to {$schedule->destination->name})");
 
-            // Analyze route viability
-            $routeRisk = $geoIntelligence->analyzeRouteViability($schedule->origin, $schedule->destination);
+            $routeRisk = $geoIntelligence->analyzeRouteViability($schedule->origin, $schedule->destination, $schedule->departure_time);
             
             if ($routeRisk['route_risk_score'] >= 85 || $routeRisk['max_wave_height'] > 2.5) {
                 $this->warn("Schedule {$schedule->id} exceeded risk threshold (Score: {$routeRisk['route_risk_score']}). Cancelling...");
 
-                // 1. Mark schedule as cancelled
                 $schedule->update(['status' => 'cancelled']);
 
-                // 2. Notify passengers and mark bookings for refund
                 $paidBookings = $schedule->bookings->where('payment_status', 'paid');
                 
                 foreach ($paidBookings as $booking) {
                     try {
-                        // 2a. Issue Stripe Refund if payment intent exists
                         if (!empty($booking->stripe_payment_intent) && !str_starts_with($booking->stripe_payment_intent, 'pi_dummy')) {
                             \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
                             \Stripe\Refund::create([
                                 'payment_intent' => $booking->stripe_payment_intent,
                             ]);
                             $this->info("Issued Stripe refund for Booking Ref: {$booking->booking_reference}");
-                        } else {
-                            $this->info("Skipped real Stripe refund for dummy/missing payment intent on Booking Ref: {$booking->booking_reference}");
                         }
 
-                        // 2b. Send cancellation email
                         Mail::to($booking->passenger_email)->send(new TicketCancelledDueToWeather($booking, $schedule));
                         
-                        // 2c. Mark booking as refunded
                         $booking->update(['payment_status' => 'refunded']);
                         
-                        $this->info("Sent cancellation email to {$booking->passenger_email} (Booking Ref: {$booking->booking_reference})");
+                        $this->info("Sent cancellation email to {$booking->passenger_email}");
                     } catch (\Exception $e) {
                         Log::error("Failed to process refund/email for {$booking->passenger_email}: " . $e->getMessage());
-                        $this->error("Failed to process refund/email for {$booking->passenger_email}. Error: " . $e->getMessage());
                     }
                 }
             } else {

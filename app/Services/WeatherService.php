@@ -81,48 +81,95 @@ class WeatherService
      * waypoint).  Results are cached for one hour so repeated route
      * scans don't hammer the APIs.
      */
-    public function getMarineForecast(float $lat, float $lon): ?array
+    public function getMarineForecast(float $lat, float $lon, \Carbon\Carbon $targetTime = null): ?array
     {
         $lat = round($lat, 2);
         $lon = round($lon, 2);
 
-        return Cache::remember("marine_forecast_{$lat}_{$lon}", 3600, function () use ($lat, $lon) {
+        $isFuture = $targetTime && $targetTime->isFuture();
+        $cacheKey = "marine_forecast_{$lat}_{$lon}";
+        if ($isFuture) {
+            $cacheKey .= "_" . $targetTime->format('YmdH');
+        }
+
+        return Cache::remember($cacheKey, 3600, function () use ($lat, $lon, $targetTime, $isFuture) {
             try {
-                $apiKey = env('VITE_OPENWEATHER_API_KEY');
+                if ($isFuture) {
+                    $marine = Http::timeout(5)->get('https://marine-api.open-meteo.com/v1/marine', [
+                        'latitude'  => $lat,
+                        'longitude' => $lon,
+                        'hourly'    => 'wave_height,wave_direction,wave_period,swell_wave_height',
+                        'timezone'  => 'UTC',
+                    ]);
 
-                $owm = Http::timeout(5)->get('https://api.openweathermap.org/data/2.5/weather', [
-                    'lat'   => $lat,
-                    'lon'   => $lon,
-                    'appid' => $apiKey,
-                    'units' => 'metric',
-                ]);
+                    $weather = Http::timeout(5)->get('https://api.open-meteo.com/v1/forecast', [
+                        'latitude'  => $lat,
+                        'longitude' => $lon,
+                        'hourly'    => 'wind_speed_10m,visibility',
+                        'timezone'  => 'UTC',
+                    ]);
 
-                $marine = Http::timeout(3)->get('https://marine-api.open-meteo.com/v1/marine', [
-                    'latitude'  => $lat,
-                    'longitude' => $lon,
-                    'current'   => 'wave_height,wave_direction,wave_period,swell_wave_height',
-                    'timezone'  => 'Asia/Singapore',
-                ]);
+                    $windSpeed     = 0;
+                    $visibility    = 10;
+                    $waveHeight    = 0;
+                    $waveDirection = 0;
+                    $wavePeriod    = 0;
+                    $swellHeight   = 0;
 
-                $windSpeed     = 0;
-                $visibility    = 10;
-                $waveHeight    = 0;
-                $waveDirection = 0;
-                $wavePeriod    = 0;
-                $swellHeight   = 0;
+                    if ($marine->successful() && $weather->successful()) {
+                        $m = $marine->json('hourly');
+                        $w = $weather->json('hourly');
+                        
+                        $targetStr = $targetTime->copy()->setTimezone('UTC')->format('Y-m-d\TH:00');
+                        $index = array_search($targetStr, $m['time'] ?? []);
+                        
+                        if ($index !== false) {
+                            $waveHeight    = $m['wave_height'][$index] ?? 0;
+                            $waveDirection = $m['wave_direction'][$index] ?? 0;
+                            $wavePeriod    = $m['wave_period'][$index] ?? 0;
+                            $swellHeight   = $m['swell_wave_height'][$index] ?? 0;
+                            
+                            $windSpeed     = $w['wind_speed_10m'][$index] ?? 0;
+                            $visibility    = ($w['visibility'][$index] ?? 10000) / 1000;
+                        }
+                    }
+                } else {
+                    $apiKey = env('VITE_OPENWEATHER_API_KEY');
 
-                if ($owm->successful()) {
-                    $data       = $owm->json();
-                    $windSpeed  = ($data['wind']['speed'] ?? 0) * 3.6;
-                    $visibility = ($data['visibility'] ?? 10000) / 1000;
-                }
+                    $owm = Http::timeout(5)->get('https://api.openweathermap.org/data/2.5/weather', [
+                        'lat'   => $lat,
+                        'lon'   => $lon,
+                        'appid' => $apiKey,
+                        'units' => 'metric',
+                    ]);
 
-                if ($marine->successful()) {
-                    $m             = $marine->json('current');
-                    $waveHeight    = $m['wave_height']       ?? 0;
-                    $waveDirection = $m['wave_direction']     ?? 0;
-                    $wavePeriod    = $m['wave_period']        ?? 0;
-                    $swellHeight   = $m['swell_wave_height']  ?? 0;
+                    $marine = Http::timeout(3)->get('https://marine-api.open-meteo.com/v1/marine', [
+                        'latitude'  => $lat,
+                        'longitude' => $lon,
+                        'current'   => 'wave_height,wave_direction,wave_period,swell_wave_height',
+                        'timezone'  => 'Asia/Singapore',
+                    ]);
+
+                    $windSpeed     = 0;
+                    $visibility    = 10;
+                    $waveHeight    = 0;
+                    $waveDirection = 0;
+                    $wavePeriod    = 0;
+                    $swellHeight   = 0;
+
+                    if ($owm->successful()) {
+                        $data       = $owm->json();
+                        $windSpeed  = ($data['wind']['speed'] ?? 0) * 3.6;
+                        $visibility = ($data['visibility'] ?? 10000) / 1000;
+                    }
+
+                    if ($marine->successful()) {
+                        $m             = $marine->json('current');
+                        $waveHeight    = $m['wave_height']       ?? 0;
+                        $waveDirection = $m['wave_direction']     ?? 0;
+                        $wavePeriod    = $m['wave_period']        ?? 0;
+                        $swellHeight   = $m['swell_wave_height']  ?? 0;
+                    }
                 }
 
                 $readings = [
