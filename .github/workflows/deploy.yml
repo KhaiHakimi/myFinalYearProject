@@ -1,0 +1,27 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main # Triggers when code is pushed to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Execute Deployment Script via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # IMPORTANT: Change '/var/www/Ferrycast' to the actual path of your project on the Droplet!
+          script: |
+            cd /var/www/Ferrycast
+            
+            # Ensure the deployment script is executable
+            chmod +x deploy.sh
+            
+            # Run the deployment script
+            ./deploy.sh
