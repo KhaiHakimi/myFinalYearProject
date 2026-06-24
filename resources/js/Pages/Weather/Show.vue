@@ -486,9 +486,14 @@
                                             </span>
                                         </td>
                                         <td class="p-4 pr-8 text-right relative z-10 pointer-events-auto">
-                                            <button @click="openBookingModal(schedule)"
+                                            <button v-if="getScheduleStatus(schedule) === 'upcoming'"
+                                                @click="openBookingModal(schedule)"
                                                 class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                                                 Book Now
+                                            </button>
+                                            <button v-else disabled
+                                                class="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300 shadow-inner">
+                                                Closed
                                             </button>
                                         </td>
                                     </tr>

@@ -31,6 +31,10 @@ class PaymentController extends Controller
 
         $schedule = Schedule::with(['ferry', 'origin', 'destination'])->findOrFail($validated['schedule_id']);
 
+        if (\Carbon\Carbon::parse($schedule->departure_time)->isPast()) {
+            return redirect()->back()->with('error', 'This sailing has already departed and cannot be booked.');
+        }
+
         // Prevent overbooking: check capacity across all channels
         if (! $schedule->hasAvailableSeats($validated['quantity'])) {
             $available = $schedule->availableSeats();
