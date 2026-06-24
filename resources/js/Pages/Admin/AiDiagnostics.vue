@@ -187,7 +187,7 @@
                                     <!-- Time & Status -->
                                     <div class="flex justify-between w-full items-center">
                                         <span class="text-gray-500 font-mono font-bold text-sm bg-gray-50 px-2 py-1 rounded">{{ exec.time_ms }} ms</span>
-                                        <span :class="exec.status.includes('Optimal') ? 'text-emerald-600 bg-emerald-50' : 'text-yellow-600 bg-yellow-50'" class="font-bold uppercase text-xs px-2 py-1 rounded flex items-center gap-1 border" :class="exec.status.includes('Optimal') ? 'border-emerald-200' : 'border-yellow-200'">
+                                        <span class="font-bold uppercase text-xs px-2 py-1 rounded flex items-center gap-1 border" :class="exec.status.includes('Optimal') ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : 'text-yellow-600 bg-yellow-50 border-yellow-200'">
                                             <svg v-if="exec.status.includes('Optimal')" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                             <svg v-else class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                             {{ exec.status }}
