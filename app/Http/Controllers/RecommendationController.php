@@ -215,4 +215,66 @@ class RecommendationController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Render the detailed AI Diagnostics page.
+     */
+    public function diagnosticsPage()
+    {
+        // Mock data reflecting the Python AI pipeline details
+        $diagnostics = [
+            'evaluation' => [
+                'random_forest' => [
+                    'accuracy' => 0.92,
+                    'f1_score' => 0.91,
+                    'precision' => 0.89,
+                    'recall' => 0.93,
+                    'confusion_matrix' => [
+                        ['actual' => 'Operational', 'predicted_operational' => 845, 'predicted_cancelled' => 124],
+                        ['actual' => 'Cancelled', 'predicted_operational' => 98, 'predicted_cancelled' => 4120],
+                    ],
+                ],
+                'topsis' => [
+                    'criteria' => ['Cost', 'Duration', 'Safety', 'Transfers'],
+                    'type' => 'Cost-based (lower is better for all)',
+                    'normalization_method' => 'Vector Normalization',
+                ]
+            ],
+            'hyperparameters' => [
+                'random_forest' => [
+                    'n_estimators' => 400,
+                    'max_depth' => 25,
+                    'min_samples_split' => 4,
+                    'min_samples_leaf' => 2,
+                    'max_features' => 'sqrt',
+                    'class_weight' => 'balanced_subsample',
+                    'random_state' => 42,
+                ],
+                'topsis_weights' => [
+                    'balanced' => ['cost' => 0.35, 'duration' => 0.25, 'safety' => 0.25, 'transfers' => 0.15],
+                    'cheapest' => ['cost' => 0.55, 'duration' => 0.15, 'safety' => 0.20, 'transfers' => 0.10],
+                    'fastest'  => ['cost' => 0.15, 'duration' => 0.55, 'safety' => 0.15, 'transfers' => 0.15],
+                    'safest'   => ['cost' => 0.15, 'duration' => 0.15, 'safety' => 0.55, 'transfers' => 0.15],
+                ]
+            ],
+            'execution_pipeline' => [
+                ['stage' => 'Data Ingestion', 'algorithm' => 'Pandas Dataframe Loading', 'time_ms' => 12.5, 'status' => 'Optimal'],
+                ['stage' => 'Feature Extraction', 'algorithm' => 'StandardScaler & Encoder', 'time_ms' => 18.2, 'status' => 'Optimal'],
+                ['stage' => 'Safety Prediction', 'algorithm' => 'RandomForestClassifier', 'time_ms' => 120.3, 'status' => 'Optimal'],
+                ['stage' => 'Route Generation', 'algorithm' => 'Graph Traversal (Multi-leg)', 'time_ms' => 45.1, 'status' => 'Warning'],
+                ['stage' => 'Decision Ranking', 'algorithm' => 'TOPSIS (Euclidean Dist)', 'time_ms' => 8.4, 'status' => 'Optimal'],
+            ],
+            'rf_branches' => [
+                ['branch_id' => 'Tree-01', 'rule' => 'wave_height > 1.8m', 'samples' => 1420, 'prediction' => 'Cancelled', 'gini' => 0.124],
+                ['branch_id' => 'Tree-02', 'rule' => 'visibility < 2.5km AND Night', 'samples' => 850, 'prediction' => 'Cancelled', 'gini' => 0.089],
+                ['branch_id' => 'Tree-03', 'rule' => 'wind_speed < 35km/h', 'samples' => 8400, 'prediction' => 'Operational', 'gini' => 0.245],
+                ['branch_id' => 'Tree-04', 'rule' => 'swell_height > 1.5m AND wind_speed > 30km/h', 'samples' => 3200, 'prediction' => 'Cancelled', 'gini' => 0.198],
+                ['branch_id' => 'Tree-05', 'rule' => 'month IN (11, 12, 1, 2) AND wave_height > 1.5m', 'samples' => 1100, 'prediction' => 'Cancelled', 'gini' => 0.210],
+            ]
+        ];
+
+        return \Inertia\Inertia::render('Admin/AiDiagnostics', [
+            'diagnostics' => $diagnostics
+        ]);
+    }
 }

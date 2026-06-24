@@ -88,12 +88,12 @@
                                 </svg>
                                 {{ training ? 'Training Neural Net...' : 'Train Algorithm' }}
                             </button>
-                            <button @click="showMatrixModal = true" class="relative inline-flex items-center justify-center px-8 py-3 w-full text-sm font-bold text-indigo-100 transition-all duration-200 bg-white/10 border border-white/20 rounded-full shadow-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50 backdrop-blur-sm">
+                            <Link href="/admin/ai/diagnostics" class="relative inline-flex items-center justify-center px-8 py-3 w-full text-sm font-bold text-indigo-100 transition-all duration-200 bg-white/10 border border-white/20 rounded-full shadow-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/50 backdrop-blur-sm">
                                 <svg class="w-5 h-5 mr-3 -ml-1 text-indigo-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                 </svg>
                                 View Matrix
-                            </button>
+                            </Link>
                             <div class="text-[10px] text-indigo-300 font-medium text-center max-w-[200px]">Review internal ML weights and confusion matrices</div>
                         </div>
                     </div>
@@ -230,137 +230,13 @@
             </div>
         </div>
 
-        <!-- Algorithm Matrix Modal -->
-        <Modal :show="showMatrixModal" @close="showMatrixModal = false" maxWidth="5xl">
-            <div class="p-8 bg-slate-900 text-slate-300 max-h-[90vh] overflow-y-auto custom-scrollbar">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
-                        <svg class="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                        </svg>
-                        Algorithm Diagnostics Matrix
-                    </h2>
-                    <button @click="showMatrixModal = false" class="text-slate-400 hover:text-white transition">
-                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Feature Weights Table -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-indigo-300 mb-4 border-b border-slate-700 pb-2">Recommendation Feature Weights</h3>
-                        <div class="overflow-x-auto rounded-lg border border-slate-700">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs text-slate-400 uppercase bg-slate-800">
-                                    <tr>
-                                        <th scope="col" class="px-4 py-3">Feature</th>
-                                        <th scope="col" class="px-4 py-3 text-center">Weight</th>
-                                        <th scope="col" class="px-4 py-3 text-center">Impact</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="fw in featureWeights" :key="fw.feature" class="border-b border-slate-700 hover:bg-slate-800/50">
-                                        <td class="px-4 py-3 font-medium text-white">{{ fw.feature }}</td>
-                                        <td class="px-4 py-3 text-center text-emerald-400 font-mono">{{ fw.weight }}</td>
-                                        <td class="px-4 py-3 text-center">
-                                            <span class="px-2 py-1 rounded text-xs font-bold"
-                                                  :class="{'bg-rose-500/20 text-rose-300': fw.impact === 'High', 'bg-yellow-500/20 text-yellow-300': fw.impact === 'Medium', 'bg-slate-500/20 text-slate-300': fw.impact === 'Low'}">
-                                                {{ fw.impact }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Confusion Matrix -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-indigo-300 mb-4 border-b border-slate-700 pb-2">Prediction Confusion Matrix</h3>
-                        <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 relative">
-                            <div class="grid grid-cols-3 gap-2 text-center text-sm items-center">
-                                <div class="col-start-2 text-xs uppercase text-slate-400 font-bold">Predicted Booked</div>
-                                <div class="col-start-3 text-xs uppercase text-slate-400 font-bold">Predicted Not</div>
-                                
-                                <div class="flex items-center justify-end pr-4 text-xs uppercase text-slate-400 font-bold text-right">Actual Booked</div>
-                                <div class="bg-emerald-500/20 border border-emerald-500/30 rounded p-4 text-emerald-300 font-mono text-xl font-bold">{{ confusionMatrix[0].predictedBooked }}</div>
-                                <div class="bg-rose-500/20 border border-rose-500/30 rounded p-4 text-rose-300 font-mono text-xl">{{ confusionMatrix[0].predictedNotBooked }}</div>
-                                
-                                <div class="flex items-center justify-end pr-4 text-xs uppercase text-slate-400 font-bold text-right">Actual Not</div>
-                                <div class="bg-rose-500/20 border border-rose-500/30 rounded p-4 text-rose-300 font-mono text-xl">{{ confusionMatrix[1].predictedBooked }}</div>
-                                <div class="bg-slate-700 border border-slate-600 rounded p-4 text-slate-300 font-mono text-xl font-bold">{{ confusionMatrix[1].predictedNotBooked }}</div>
-                            </div>
-                            <div class="mt-4 text-xs text-slate-400 text-center flex justify-between">
-                                <span>Model: Random Forest Classifier (v2.1)</span>
-                                <span class="text-emerald-400 font-bold">F1-Score: 0.92</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                    <!-- Execution Matrix -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-indigo-300 mb-4 border-b border-slate-700 pb-2">Algorithm Execution Pipeline</h3>
-                        <div class="overflow-x-auto rounded-lg border border-slate-700">
-                            <table class="w-full text-sm text-left">
-                                <thead class="text-xs text-slate-400 uppercase bg-slate-800">
-                                    <tr>
-                                        <th class="px-4 py-3">Algorithm</th>
-                                        <th class="px-4 py-3">Stage</th>
-                                        <th class="px-4 py-3 text-right">Exec Time</th>
-                                        <th class="px-4 py-3 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="exec in executionMatrix" :key="exec.algorithm" class="border-b border-slate-700 hover:bg-slate-800/50">
-                                        <td class="px-4 py-3 font-medium text-white">{{ exec.algorithm }}</td>
-                                        <td class="px-4 py-3 text-slate-400">{{ exec.stage }}</td>
-                                        <td class="px-4 py-3 text-right font-mono text-indigo-300">{{ exec.timeMs }}ms</td>
-                                        <td class="px-4 py-3 text-center">
-                                            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider"
-                                                  :class="exec.status === 'Optimal' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'">
-                                                {{ exec.status }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- RF Branches -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-indigo-300 mb-4 border-b border-slate-700 pb-2">Random Forest Decision Branches (Top 5)</h3>
-                        <div class="space-y-3">
-                            <div v-for="branch in rfBranches" :key="branch.branchId" class="bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-indigo-500/50 transition">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-indigo-400 font-mono">{{ branch.branchId }}</span>
-                                    <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-full tracking-wider"
-                                          :class="branch.prediction.includes('Low Risk') || branch.prediction.includes('Highly') ? 'bg-emerald-500/20 text-emerald-300' : (branch.prediction.includes('High Risk') ? 'bg-rose-500/20 text-rose-300' : 'bg-slate-500/20 text-slate-300')">
-                                        {{ branch.prediction }}
-                                    </span>
-                                </div>
-                                <div class="text-sm text-emerald-400 font-mono mb-2 bg-slate-900 p-2 rounded border border-slate-700/50">
-                                    <span class="text-slate-500">IF</span> {{ branch.rule }}
-                                </div>
-                                <div class="flex justify-between items-center text-xs text-slate-500 font-medium">
-                                    <span>Gini Impurity: {{ branch.gini }}</span>
-                                    <span>Samples: {{ branch.samples.toLocaleString() }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Modal>
     </AuthenticatedLayout>
 </template>
 
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import Modal from '@/Components/Modal.vue'
-    import { Head } from '@inertiajs/vue3'
+    import { Head, Link } from '@inertiajs/vue3'
     import { ref, onMounted } from 'vue'
 
     const analytics = ref({
@@ -379,36 +255,7 @@
 
     const loading = ref(true)
     const training = ref(false)
-    const showMatrixModal = ref(false)
 
-    const featureWeights = [
-        { feature: 'Price Difference', weight: '0.35', impact: 'High' },
-        { feature: 'Travel Duration', weight: '0.25', impact: 'Medium' },
-        { feature: 'Weather (Wave Height)', weight: '0.20', impact: 'High' },
-        { feature: 'Time of Day', weight: '0.10', impact: 'Low' },
-        { feature: 'Historical Popularity', weight: '0.10', impact: 'Medium' },
-    ]
-
-    const confusionMatrix = [
-        { actual: 'Booked', predictedBooked: 845, predictedNotBooked: 124 },
-        { actual: 'Not Booked', predictedBooked: 98, predictedNotBooked: 4120 },
-    ]
-
-    const executionMatrix = [
-        { algorithm: 'Collaborative Filtering', stage: 'User Profiling', timeMs: 42.1, status: 'Optimal' },
-        { algorithm: 'Content-Based Filtering', stage: 'Feature Extraction', timeMs: 18.5, status: 'Optimal' },
-        { algorithm: 'Random Forest (Safety)', stage: 'Weather Inference', timeMs: 120.3, status: 'Warning' },
-        { algorithm: 'Gradient Boosting', stage: 'Price Elasticity', timeMs: 55.0, status: 'Optimal' },
-        { algorithm: 'Ensemble Aggregator', stage: 'Final Scoring', timeMs: 12.8, status: 'Optimal' },
-    ]
-
-    const rfBranches = [
-        { branchId: 'Tree-01', rule: 'Wave_Height > 1.5m', samples: 1420, prediction: 'High Risk', gini: '0.124' },
-        { branchId: 'Tree-02', rule: 'Visibility < 5km AND Night', samples: 850, prediction: 'High Risk', gini: '0.089' },
-        { branchId: 'Tree-03', rule: 'Wind_Speed < 15kts', samples: 8400, prediction: 'Low Risk', gini: '0.245' },
-        { branchId: 'Tree-04', rule: 'Price_Diff > 20 AND Duration < 1h', samples: 3200, prediction: 'Highly Recommended', gini: '0.198' },
-        { branchId: 'Tree-05', rule: 'Historical_Popularity < 0.2', samples: 1100, prediction: 'Not Recommended', gini: '0.210' },
-    ]
 
     onMounted(async () => {
         try {
@@ -474,19 +321,4 @@
         to { opacity: 1; transform: translate3d(0, 0, 0); }
     }
     .animate-fade-in-down { animation: fadeInDown 0.6s ease-out both; }
-    
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(15, 23, 42, 0.5); 
-        border-radius: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.5); 
-        border-radius: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.8); 
-    }
 </style>
