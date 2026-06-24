@@ -69,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin Only Routes
     Route::middleware(['admin'])->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class)->only(['index', 'destroy']);
         Route::resource('ferries', FerryController::class);
         // Schedules: Admin can create/edit/delete. Index is public.
         Route::post('/schedules/generate', [\App\Http\Controllers\ScheduleController::class, 'generateDaily'])->name('schedules.generate');

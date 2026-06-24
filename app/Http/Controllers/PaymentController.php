@@ -128,6 +128,12 @@ class PaymentController extends Controller
 
                 // Update seat counts across all channels
                 $booking->schedule->recalculateSeats();
+
+                // Send the receipt email
+                if ($booking->user) {
+                    $booking->load('schedule.ferry', 'schedule.origin', 'schedule.destination');
+                    \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingReceipt($booking));
+                }
             }
 
             return Inertia::render('Payment/Success', [

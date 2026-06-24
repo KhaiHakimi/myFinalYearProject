@@ -135,6 +135,12 @@
                                         🔗 Channel Manager
                                     </DropdownLink>
                                     <DropdownLink
+                                        v-if="$page.props.auth.user?.is_admin"
+                                        :href="route('users.index')"
+                                    >
+                                        👥 Manage Users
+                                    </DropdownLink>
+                                    <DropdownLink
                                         :href="route('logout')"
                                         method="post"
                                         as="button"
