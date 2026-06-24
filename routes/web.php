@@ -142,3 +142,8 @@ Route::get('/fix-prices', function () {
     return "SUCCESS: Updated price to RM 2.00 for $updated schedules between " . $p1->name . " and " . $p2->name;
 });
 
+// --- Temporary Test Route for Weather Cancellation Email ---
+Route::get('/test-cancellation/{email}', function ($email) {
+    \Illuminate\Support\Facades\Artisan::call('test:weather-cancellation', ['email' => $email]);
+    return "<pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre>";
+});
