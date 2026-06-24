@@ -127,7 +127,8 @@ function updateRoutes() {
         const polyline = L.polyline(latLngs, {
             color: r.color || 'blue',
             weight: r.weight || 4,
-            opacity: 0.7
+            opacity: 0.7,
+            dashArray: r.dashArray || null
         });
         routeLayer.addLayer(polyline);
     });

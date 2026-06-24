@@ -165,32 +165,96 @@
     })
 
     const mapRoutes = computed(() => {
-        if (!currentOrigin.value || peninsularPorts.value.length === 0)
-            return []
+        const routes = []
 
-        // The ports are sorted by distance in calculateDistances(), so the first one is the nearest.
-        const nearestPort = peninsularPorts.value[0]
-
-        if (!nearestPort || !nearestPort.latitude || !nearestPort.longitude)
-            return []
-
-        return [
-            {
-                id: 'nearest-route',
+        // 1. If user clicked a specific jetty directly
+        if (selectedOrigin.value && userLocation.value) {
+            routes.push({
+                id: 'user-to-selected',
                 path: [
-                    {
-                        lat: currentOrigin.value.lat,
-                        lng: currentOrigin.value.lng,
-                    },
-                    {
-                        lat: parseFloat(nearestPort.latitude),
-                        lng: parseFloat(nearestPort.longitude),
-                    },
+                    { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                    { lat: parseFloat(selectedOrigin.value.lat), lng: parseFloat(selectedOrigin.value.lng) }
                 ],
-                color: '#10B981', // Emerald-500
-                weight: 4,
-            },
-        ]
+                color: '#10B981', // Emerald (Green) line
+                weight: 4
+            })
+            return routes
+        }
+
+        // 2. If user scanned their location (no specific jetty chosen yet)
+        if (!selectedOrigin.value && userLocation.value && geoAnalysisResult.value) {
+            const nearestAny = geoAnalysisResult.value.nearest_any_port?.port
+            const nearestSafe = geoAnalysisResult.value.nearest_safe_port?.port
+
+            if (nearestAny && nearestSafe) {
+                if (nearestAny.id !== nearestSafe.id) {
+                    // Show line to nearest (which is unsafe) as red/dashed
+                    routes.push({
+                        id: 'user-to-nearest',
+                        path: [
+                            { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                            { lat: parseFloat(nearestAny.latitude), lng: parseFloat(nearestAny.longitude) }
+                        ],
+                        color: '#EF4444', // Red line
+                        weight: 4,
+                        dashArray: '5, 8'
+                    })
+                    // Show line to recommended safe destination as green
+                    routes.push({
+                        id: 'user-to-safe',
+                        path: [
+                            { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                            { lat: parseFloat(nearestSafe.latitude), lng: parseFloat(nearestSafe.longitude) }
+                        ],
+                        color: '#10B981', // Green line
+                        weight: 4
+                    })
+                } else {
+                    // Nearest is safe, show single green line
+                    routes.push({
+                        id: 'user-to-nearest-safe',
+                        path: [
+                            { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                            { lat: parseFloat(nearestSafe.latitude), lng: parseFloat(nearestSafe.longitude) }
+                        ],
+                        color: '#10B981', // Green line
+                        weight: 4
+                    })
+                }
+            } else if (nearestAny) {
+                // Edge case: No safe ports exist, just show line to nearest
+                routes.push({
+                    id: 'user-to-nearest-only',
+                    path: [
+                        { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                        { lat: parseFloat(nearestAny.latitude), lng: parseFloat(nearestAny.longitude) }
+                    ],
+                    color: '#F59E0B', // Amber line
+                    weight: 4,
+                    dashArray: '5, 8'
+                })
+            }
+            
+            return routes
+        }
+
+        // 3. Fallback (e.g. before API response arrives)
+        if (userLocation.value && peninsularPorts.value.length > 0) {
+            const nearestPort = peninsularPorts.value[0]
+            if (nearestPort && nearestPort.latitude && nearestPort.longitude) {
+                routes.push({
+                    id: 'nearest-route-fallback',
+                    path: [
+                        { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                        { lat: parseFloat(nearestPort.latitude), lng: parseFloat(nearestPort.longitude) }
+                    ],
+                    color: '#10B981', 
+                    weight: 4
+                })
+            }
+        }
+
+        return routes
     })
 
     const scanAllRoutes = () => {
@@ -661,11 +725,47 @@
                                     @marker-click="handleMapMarkerClick"
                                 />
                             </div>
-                            <p class="text-sm text-blue-600/60 mt-4 italic">
-                                * Blue dot represents your location. Click on
-                                any anchor icon to view real-time weather and
-                                find nearest jetties to it.
-                            </p>
+                            <div class="mt-4 p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 text-sm">
+                                <h4 class="font-bold text-blue-900 mb-3 text-xs uppercase tracking-widest">Map Legend & User Guide</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <span class="w-3 h-3 rounded-full bg-blue-600 shadow-sm border border-white"></span>
+                                            <span class="text-xs"><strong>Your Location</strong> (GPS or Searched)</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <span class="w-3 h-3 rounded-full bg-green-600 shadow-sm border border-white"></span>
+                                            <span class="text-xs"><strong>Nearest Jetty</strong></span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <span class="w-3 h-3 rounded-full bg-purple-600 shadow-sm border border-white"></span>
+                                            <span class="text-xs"><strong>Selected Jetty</strong> (Click map to select)</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <span class="w-3 h-3 rounded-full bg-orange-500 shadow-sm border border-white"></span>
+                                            <span class="text-xs"><strong>Nearby Jetties</strong> (Top 3 closest)</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-700">
+                                            <span class="w-3 h-3 rounded-full bg-red-500 shadow-sm border border-white"></span>
+                                            <span class="text-xs"><strong>Other Jetties</strong></span>
+                                        </div>
+                                        <div class="flex items-center gap-3 text-gray-700 mt-1">
+                                            <div class="flex flex-col gap-2">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-6 border-t-2 border-emerald-500"></div>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Safe Route</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-6 border-t-2 border-red-500 border-dashed"></div>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-700">High-Risk Route</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </section>
                     </div>
                 </div>

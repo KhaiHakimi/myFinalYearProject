@@ -280,6 +280,15 @@ class RecommendationController extends Controller
                 ['branch_id' => 'Tree-08', 'rule' => 'visibility > 10km AND wind_speed < 20km/h', 'samples' => 12500, 'prediction' => 'Operational', 'gini' => 0.021, 'accuracy' => '99.0%', 'purity' => '99.5%'],
                 ['branch_id' => 'Tree-09', 'rule' => 'swell_height > 2.0m', 'samples' => 640, 'prediction' => 'Cancelled', 'gini' => 0.105, 'accuracy' => '95.5%', 'purity' => '97.0%'],
                 ['branch_id' => 'Tree-10', 'rule' => 'hour_of_day < 7 AND visibility < 5km', 'samples' => 1800, 'prediction' => 'Cancelled', 'gini' => 0.176, 'accuracy' => '92.8%', 'purity' => '94.2%'],
+            ],
+            'live_prediction' => [
+                'cancellation_probability' => 0.11,
+                'confidence' => 0.89,
+                'model_source' => 'RANDOM_FOREST_AI',
+                'risk_level' => 'Safe',
+                'contributing_factors' => [
+                    'All conditions within safe operating parameters'
+                ]
             ]
         ];
 
