@@ -9,7 +9,6 @@ use App\Models\Schedule;
 use App\Models\Booking;
 use App\Models\User;
 use App\Services\GeoIntelligenceService;
-use Mockery;
 
 class TestWeatherCancellation extends Command
 {
@@ -55,15 +54,18 @@ class TestWeatherCancellation extends Command
         
         $this->info("Created dummy schedule {$schedule->id} and booking {$booking->id} for {$email}");
 
-        // 4. Mock GeoIntelligenceService to force high risk
-        $mockGeoService = Mockery::mock(GeoIntelligenceService::class);
-        $mockGeoService->shouldReceive('analyzeRouteViability')
-            ->andReturn([
-                'is_deep_sea_risky' => true,
-                'max_wave_height' => 3.0,
-                'route_risk_score' => 90,
-                'checkpoints' => []
-            ]);
+        // 4. Mock GeoIntelligenceService to force high risk (without Mockery for production compatibility)
+        $mockGeoService = new class(app(\App\Services\WeatherService::class)) extends GeoIntelligenceService {
+            public function analyzeRouteViability(Port $origin, Port $destination, \Carbon\Carbon $targetTime = null): array
+            {
+                return [
+                    'is_deep_sea_risky' => true,
+                    'max_wave_height' => 3.0,
+                    'route_risk_score' => 90,
+                    'checkpoints' => []
+                ];
+            }
+        };
             
         app()->instance(GeoIntelligenceService::class, $mockGeoService);
         
