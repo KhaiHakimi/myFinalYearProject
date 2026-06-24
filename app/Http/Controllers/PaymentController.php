@@ -130,9 +130,9 @@ class PaymentController extends Controller
                 $booking->schedule->recalculateSeats();
 
                 // Send the receipt email
-                if ($booking->user) {
+                if ($booking->passenger_email) {
                     $booking->load('schedule.ferry', 'schedule.origin', 'schedule.destination');
-                    \Illuminate\Support\Facades\Mail::to($booking->user->email)->send(new \App\Mail\BookingReceipt($booking));
+                    \Illuminate\Support\Facades\Mail::to($booking->passenger_email)->send(new \App\Mail\BookingReceipt($booking));
                 }
             }
 

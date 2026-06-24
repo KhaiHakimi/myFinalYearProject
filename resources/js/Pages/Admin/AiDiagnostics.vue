@@ -18,64 +18,6 @@
         <div class="py-6 md:py-12 bg-gray-50 min-h-screen">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 md:space-y-12">
                 
-                <!-- Live System Prediction (Mock) -->
-                <div v-if="diagnostics.live_prediction" class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden animate-fade-in-down mb-6">
-                    <div class="p-6 md:p-8">
-                        <div class="space-y-4 max-w-md">
-                            <h4 class="text-xs font-black uppercase tracking-widest text-blue-900/50 mb-2">Cancellation Prediction</h4>
-                            <div class="flex items-center gap-6">
-                                <div class="relative w-28 h-28 flex-shrink-0">
-                                    <svg class="w-28 h-28 transform -rotate-90" viewBox="0 0 120 120">
-                                        <circle cx="60" cy="60" r="52" fill="none" stroke-width="12" class="stroke-gray-50" />
-                                        <circle cx="60" cy="60" r="52" fill="none" stroke-width="12" stroke-linecap="round"
-                                            :stroke-dasharray="`${(diagnostics.live_prediction.cancellation_probability * 100) * 3.267} 326.7`"
-                                            :class="{
-                                                'stroke-emerald-500': diagnostics.live_prediction.cancellation_probability < 0.30,
-                                                'stroke-yellow-400': diagnostics.live_prediction.cancellation_probability >= 0.30 && diagnostics.live_prediction.cancellation_probability < 0.65,
-                                                'stroke-rose-500': diagnostics.live_prediction.cancellation_probability >= 0.65,
-                                            }"
-                                            style="transition: stroke-dasharray 1.5s ease-in-out"
-                                        />
-                                    </svg>
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span class="text-3xl font-black text-blue-900">{{ Math.round(diagnostics.live_prediction.cancellation_probability * 100) }}%</span>
-                                        <span class="text-[8px] font-black uppercase tracking-widest text-blue-900/40">Cancel</span>
-                                    </div>
-                                </div>
-                                <div class="space-y-3 flex-1">
-                                    <div class="bg-blue-50/50 rounded-xl p-3 border border-blue-50">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-[10px] font-black uppercase tracking-widest text-blue-900/50">Confidence</span>
-                                            <span class="text-sm font-black text-blue-900">{{ Math.round(diagnostics.live_prediction.confidence * 100) }}%</span>
-                                        </div>
-                                        <div class="w-full bg-gray-100 rounded-full h-2">
-                                            <div class="h-2 rounded-full transition-all duration-1000"
-                                                :class="{ 'bg-emerald-500': diagnostics.live_prediction.confidence >= 0.80, 'bg-yellow-400': diagnostics.live_prediction.confidence >= 0.60 && diagnostics.live_prediction.confidence < 0.80, 'bg-rose-400': diagnostics.live_prediction.confidence < 0.60 }"
-                                                :style="{ width: `${diagnostics.live_prediction.confidence * 100}%` }"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <div class="bg-indigo-50/50 rounded-xl p-3 border border-indigo-50">
-                                        <div class="text-[10px] font-black uppercase tracking-widest text-indigo-900/50">AI Engine</div>
-                                        <div class="text-sm font-bold text-indigo-900">{{ diagnostics.live_prediction.model_source || 'FerryCast AI' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="space-y-2 mt-4">
-                                <div v-for="(factor, idx) in diagnostics.live_prediction.contributing_factors" :key="idx"
-                                    class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2.5 border border-gray-100">
-                                    <svg class="w-4 h-4 flex-shrink-0"
-                                        :class="{ 'text-emerald-500': diagnostics.live_prediction.risk_level === 'Safe', 'text-yellow-500': diagnostics.live_prediction.risk_level === 'Caution', 'text-rose-500': diagnostics.live_prediction.risk_level === 'High Risk' }"
-                                        fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="text-xs font-medium text-gray-700">{{ factor }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Evaluation Matrix -->
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden animate-fade-in-down">
                     <div class="p-4 md:p-6 border-b border-gray-100 bg-gray-50">
