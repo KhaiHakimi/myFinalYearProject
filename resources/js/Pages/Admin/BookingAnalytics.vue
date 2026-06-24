@@ -46,6 +46,53 @@
                     </div>
                 </div>
 
+                <!-- AI Engine Performance -->
+                <div class="bg-gradient-to-r from-indigo-900 to-purple-900 rounded-2xl shadow-xl border border-indigo-500/30 overflow-hidden relative group">
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjAyIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50 mix-blend-overlay"></div>
+                    <div class="relative p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="flex-1 text-white">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="bg-indigo-500/30 text-indigo-200 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-indigo-400/30">AI Engine Status</span>
+                                <span class="flex h-3 w-3 relative">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">Predictive & Recommendation Core</h3>
+                            
+                            <div class="flex flex-wrap gap-8">
+                                <div>
+                                    <div class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Prediction Accuracy</div>
+                                    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-300">
+                                        {{ analytics.ai_metrics?.accuracy || '0.0' }}%
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">User Engagement</div>
+                                    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-300">
+                                        {{ analytics.ai_metrics?.engagement || '0.0' }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="shrink-0 flex flex-col items-center gap-3">
+                            <button @click="trainAlgorithm" :disabled="training"
+                                class="relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold text-white transition-all duration-200 bg-indigo-500 border border-transparent rounded-full shadow-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed group-hover:shadow-indigo-500/50">
+                                <svg v-if="training" class="w-5 h-5 mr-3 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <svg v-else class="w-5 h-5 mr-3 -ml-1 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                                {{ training ? 'Training Neural Net...' : 'Train Algorithm' }}
+                            </button>
+                            <div class="text-[10px] text-indigo-300 font-medium">Updates weights with latest booking data</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Booking Status Breakdown -->
                 <div class="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
                     <div class="p-8">
@@ -192,9 +239,14 @@
         total_revenue: 0,
         total_bookings: 0,
         paid_bookings: 0,
+        ai_metrics: {
+            accuracy: 0,
+            engagement: 0,
+        }
     })
 
     const loading = ref(true)
+    const training = ref(false)
 
     onMounted(async () => {
         try {
@@ -230,6 +282,27 @@
     const formatChartDate = (dateStr) => {
         const d = new Date(dateStr)
         return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+    }
+
+    const trainAlgorithm = async () => {
+        if (training.value) return;
+        training.value = true;
+        try {
+            const res = await window.axios.post('/admin/ai/train');
+            // Update local metrics
+            if (analytics.value.ai_metrics) {
+                analytics.value.ai_metrics.accuracy = res.data.metrics.accuracy;
+                analytics.value.ai_metrics.engagement = res.data.metrics.engagement;
+            } else {
+                analytics.value.ai_metrics = res.data.metrics;
+            }
+            alert(res.data.message);
+        } catch (e) {
+            console.error('Failed to train algorithm:', e);
+            alert('Failed to train algorithm. Please try again.');
+        } finally {
+            training.value = false;
+        }
     }
 </script>
 

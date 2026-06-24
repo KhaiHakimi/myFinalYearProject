@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Admin Booking Analytics
         Route::get('/admin/booking-analytics', [\App\Http\Controllers\PaymentController::class, 'analytics'])->name('admin.booking_analytics');
+        Route::post('/admin/ai/train', [\App\Http\Controllers\RecommendationController::class, 'train'])->name('admin.ai.train');
         Route::get('/admin/analytics', function () {
             return \Inertia\Inertia::render('Admin/BookingAnalytics');
         })->name('admin.analytics_page');

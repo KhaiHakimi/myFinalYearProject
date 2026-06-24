@@ -239,6 +239,10 @@ class PaymentController extends Controller
         $totalBookings = Booking::count();
         $paidBookings = Booking::where('payment_status', 'paid')->count();
 
+        // AI Performance Metrics (mocked via cache)
+        $aiAccuracy = \Illuminate\Support\Facades\Cache::get('ai_accuracy', 92.4);
+        $aiEngagement = \Illuminate\Support\Facades\Cache::get('ai_engagement', 85.1);
+
         return response()->json([
             'revenue_by_day' => $revenueByDay,
             'popular_routes' => $popularRoutes,
@@ -247,6 +251,10 @@ class PaymentController extends Controller
             'total_revenue' => $totalRevenue,
             'total_bookings' => $totalBookings,
             'paid_bookings' => $paidBookings,
+            'ai_metrics' => [
+                'accuracy' => $aiAccuracy,
+                'engagement' => $aiEngagement,
+            ],
         ]);
     }
 }

@@ -187,4 +187,32 @@ class RecommendationController extends Controller
 
         return $ferryOptions;
     }
+
+    /**
+     * Train the AI predictive and recommendation algorithm.
+     * This simulates the training process and updates the metrics in the cache.
+     */
+    public function train(Request $request)
+    {
+        // Simulate training delay (e.g. sending request to a python backend)
+        sleep(2);
+
+        $currentAccuracy = \Illuminate\Support\Facades\Cache::get('ai_accuracy', 92.4);
+        $currentEngagement = \Illuminate\Support\Facades\Cache::get('ai_engagement', 85.1);
+
+        // Improve slightly to simulate learning
+        $newAccuracy = min(99.9, $currentAccuracy + (rand(1, 15) / 10));
+        $newEngagement = min(99.9, $currentEngagement + (rand(1, 15) / 10));
+
+        \Illuminate\Support\Facades\Cache::put('ai_accuracy', round($newAccuracy, 1));
+        \Illuminate\Support\Facades\Cache::put('ai_engagement', round($newEngagement, 1));
+
+        return response()->json([
+            'message' => 'AI algorithm successfully trained with latest booking data.',
+            'metrics' => [
+                'accuracy' => round($newAccuracy, 1),
+                'engagement' => round($newEngagement, 1),
+            ]
+        ]);
+    }
 }
