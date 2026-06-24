@@ -6,9 +6,9 @@ echo "Starting deployment process..."
 # Enter maintenance mode (if the app is already down, this won't fail)
 (php artisan down) || true
 
-# Pull the latest code from the main branch
-git fetch origin main
-git reset --hard origin/main
+# Pull the latest code from the master branch
+git fetch origin master
+git reset --hard origin/master
 
 # Install PHP dependencies
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev

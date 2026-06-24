@@ -146,132 +146,6 @@
                         </div>
                     </div>
 
-                    <!-- Hamburger -->
-                    <div class="-me-2 flex items-center sm:hidden">
-                        <button
-                            @click="
-                                showingNavigationDropdown =
-                                    !showingNavigationDropdown
-                            "
-                            class="inline-flex items-center justify-center rounded-md p-2 text-blue-200 transition duration-150 ease-in-out hover:bg-blue-800 hover:text-white focus:outline-none"
-                        >
-                            <svg
-                                class="h-6 w-6"
-                                stroke="currentColor"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    :class="{
-                                        hidden: showingNavigationDropdown,
-                                        'inline-flex':
-                                            !showingNavigationDropdown,
-                                    }"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                                <path
-                                    :class="{
-                                        hidden: !showingNavigationDropdown,
-                                        'inline-flex':
-                                            showingNavigationDropdown,
-                                    }"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Responsive Navigation Menu -->
-            <div
-                :class="{
-                    block: showingNavigationDropdown,
-                    hidden: !showingNavigationDropdown,
-                }"
-                class="sm:hidden bg-blue-900 border-t border-blue-800"
-            >
-                <div class="space-y-1 pb-3 pt-2">
-                    <ResponsiveNavLink
-                        :href="route('dashboard')"
-                        :active="route().current('dashboard')"
-                    >
-                        Dashboard
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        :href="route('schedules.index')"
-                        :active="route().current('schedules.index')"
-                    >
-                        Schedules
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        href="/our-fleet"
-                        :active="$page.url.startsWith('/our-fleet')"
-                    >
-                        Our Fleet
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        v-if="$page.props.auth.user.is_admin"
-                        :href="route('ferries.index')"
-                        :active="route().current('ferries.index')"
-                    >
-                        Manage Ferries
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink
-                        v-if="$page.props.auth.user.is_admin"
-                        :href="route('admin.channel_manager')"
-                        :active="route().current('admin.channel_manager')"
-                    >
-                        Channel Manager
-                    </ResponsiveNavLink>
-                </div>
-
-                <!-- Responsive Settings Options -->
-                <div class="border-t border-blue-800 pb-1 pt-4">
-                    <div class="px-4">
-                        <div class="text-base font-black text-white">
-                            {{ $page.props.auth.user.name }}
-                        </div>
-                        <div class="text-sm font-bold text-blue-300">
-                            {{ $page.props.auth.user.email }}
-                        </div>
-                    </div>
-
-                    <div class="mt-3 space-y-1">
-                        <ResponsiveNavLink :href="route('profile.edit')">
-                            Profile
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            :href="route('bookings.index')"
-                        >
-                            My Bookings
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            v-if="$page.props.auth.user?.is_admin"
-                            :href="route('admin.analytics_page')"
-                        >
-                            📊 Analytics
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            v-if="$page.props.auth.user?.is_admin"
-                            :href="route('admin.channel_manager')"
-                        >
-                            🔗 Channel Manager
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            :href="route('logout')"
-                            method="post"
-                            as="button"
-                        >
-                            Log Out
-                        </ResponsiveNavLink>
-                    </div>
                 </div>
             </div>
         </nav>
@@ -284,8 +158,34 @@
         </header>
 
         <!-- Page Content -->
-        <main class="relative z-10">
+        <main class="relative z-10 pb-20 sm:pb-0">
             <slot />
         </main>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-200 z-50 sm:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]">
+            <div class="flex justify-between items-center h-16 px-4">
+                <!-- Home -->
+                <Link :href="route('dashboard')" class="flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95" :class="route().current('dashboard') ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'">
+                    <svg class="w-6 h-6 transition-transform" :class="route().current('dashboard') ? 'scale-110 drop-shadow-md' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wide">Home</span>
+                </Link>
+                <!-- Vessels -->
+                <Link href="/our-fleet" class="flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95" :class="$page.url.startsWith('/our-fleet') ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'">
+                    <svg class="w-6 h-6 transition-transform" :class="$page.url.startsWith('/our-fleet') ? 'scale-110 drop-shadow-md' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wide">Vessels</span>
+                </Link>
+                <!-- Schedule -->
+                <Link :href="route('schedules.index')" class="flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95" :class="route().current('schedules.index') ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'">
+                    <svg class="w-6 h-6 transition-transform" :class="route().current('schedules.index') ? 'scale-110 drop-shadow-md' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wide">Schedule</span>
+                </Link>
+                <!-- Profile -->
+                <Link :href="route('profile.edit')" class="flex flex-col items-center justify-center w-full h-full space-y-1 transition-all active:scale-95" :class="route().current('profile.edit') ? 'text-blue-600' : 'text-gray-400 hover:text-blue-500'">
+                    <svg class="w-6 h-6 transition-transform" :class="route().current('profile.edit') ? 'scale-110 drop-shadow-md' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span class="text-[10px] font-bold tracking-wide">Profile</span>
+                </Link>
+            </div>
+        </nav>
     </div>
 </template>
