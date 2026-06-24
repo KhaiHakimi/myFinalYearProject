@@ -31,7 +31,6 @@ class BookingReceipt extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('noreply@ferrycast.com', 'Ferrycast Ticketing'),
             subject: 'Your Ferry Booking Receipt - ' . $this->booking->booking_reference,
         );
     }

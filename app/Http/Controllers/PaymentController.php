@@ -131,8 +131,16 @@ class PaymentController extends Controller
 
                 // Send the receipt email
                 if ($booking->passenger_email) {
-                    $booking->load('schedule.ferry', 'schedule.origin', 'schedule.destination');
-                    \Illuminate\Support\Facades\Mail::to($booking->passenger_email)->send(new \App\Mail\BookingReceipt($booking));
+                    \Illuminate\Support\Facades\Log::info("Sending receipt email to: " . $booking->passenger_email);
+                    try {
+                        $booking->load('schedule.ferry', 'schedule.origin', 'schedule.destination');
+                        \Illuminate\Support\Facades\Mail::to($booking->passenger_email)->send(new \App\Mail\BookingReceipt($booking));
+                        \Illuminate\Support\Facades\Log::info("Receipt email sent successfully.");
+                    } catch (\Exception $mailException) {
+                        \Illuminate\Support\Facades\Log::error("Failed to send receipt email: " . $mailException->getMessage());
+                    }
+                } else {
+                    \Illuminate\Support\Facades\Log::warning("No passenger_email found for booking ID: " . $booking->id);
                 }
             }
 
