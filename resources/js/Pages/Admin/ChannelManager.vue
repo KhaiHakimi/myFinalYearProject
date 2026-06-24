@@ -842,30 +842,6 @@ function copyIcalUrl() {
                     </div>
                 </div>
 
-                <!-- iCal Info Banner -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5">
-                    <div class="flex items-start gap-4">
-                        <div class="text-3xl">📅</div>
-                        <div>
-                            <h4 class="font-bold text-gray-900">iCal Calendar Feed</h4>
-                            <p class="text-sm text-gray-600 mt-1">
-                                Subscribe to the Ferrycast schedule feed from any calendar app (Google Calendar, Apple Calendar, Outlook).
-                                The feed updates automatically with the latest schedules and seat availability.
-                            </p>
-                            <div class="mt-3 flex items-center gap-3">
-                                <code class="text-xs bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 font-mono select-all">
-                                    {{ route('schedules.ical') }}
-                                </code>
-                                <button
-                                    @click="copyIcalUrl"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
-                                >
-                                    {{ icalCopied ? '✓ Copied' : 'Copy' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
             </div>
         </div>
