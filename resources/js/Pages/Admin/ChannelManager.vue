@@ -255,12 +255,6 @@ function copyIcalUrl() {
                 </div>
                 <div class="flex items-center gap-3">
                     <button
-                        @click="copyIcalUrl"
-                        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition"
-                    >
-                        📅 {{ icalCopied ? 'Copied!' : 'Copy iCal URL' }}
-                    </button>
-                    <button
                         @click="syncAll"
                         class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition"
                     >
