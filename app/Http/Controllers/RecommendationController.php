@@ -270,6 +270,11 @@ class RecommendationController extends Controller
                 ['branch_id' => 'Tree-03', 'rule' => 'wind_speed < 35km/h', 'samples' => 8400, 'prediction' => 'Operational', 'gini' => 0.245],
                 ['branch_id' => 'Tree-04', 'rule' => 'swell_height > 1.5m AND wind_speed > 30km/h', 'samples' => 3200, 'prediction' => 'Cancelled', 'gini' => 0.198],
                 ['branch_id' => 'Tree-05', 'rule' => 'month IN (11, 12, 1, 2) AND wave_height > 1.5m', 'samples' => 1100, 'prediction' => 'Cancelled', 'gini' => 0.210],
+                ['branch_id' => 'Tree-06', 'rule' => 'wind_speed > 40km/h', 'samples' => 950, 'prediction' => 'Cancelled', 'gini' => 0.054],
+                ['branch_id' => 'Tree-07', 'rule' => 'wave_period < 4s AND wave_height > 1.2m', 'samples' => 2100, 'prediction' => 'Operational', 'gini' => 0.315],
+                ['branch_id' => 'Tree-08', 'rule' => 'visibility > 10km AND wind_speed < 20km/h', 'samples' => 12500, 'prediction' => 'Operational', 'gini' => 0.021],
+                ['branch_id' => 'Tree-09', 'rule' => 'swell_height > 2.0m', 'samples' => 640, 'prediction' => 'Cancelled', 'gini' => 0.105],
+                ['branch_id' => 'Tree-10', 'rule' => 'hour_of_day < 7 AND visibility < 5km', 'samples' => 1800, 'prediction' => 'Cancelled', 'gini' => 0.176],
             ]
         ];
 

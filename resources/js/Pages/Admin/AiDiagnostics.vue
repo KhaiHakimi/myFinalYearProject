@@ -182,27 +182,115 @@
 
                         <!-- Random Forest Branches -->
                         <div class="mt-8">
-                            <h4 class="text-cyan-300 font-semibold mb-4 text-sm uppercase tracking-wider">Top 5 Random Forest Decision Branches</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div v-for="branch in diagnostics.rf_branches" :key="branch.branch_id" class="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-cyan-500/50 transition duration-300">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <span class="text-xs font-bold text-cyan-400 font-mono">{{ branch.branch_id }}</span>
-                                        <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-full tracking-wider"
-                                              :class="branch.prediction === 'Operational' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'">
-                                            {{ branch.prediction }}
-                                        </span>
-                                    </div>
-                                    <div class="text-sm text-slate-200 font-mono mb-4 bg-slate-900 p-3 rounded border border-slate-700/50 break-words">
-                                        <span class="text-slate-500">IF</span> {{ branch.rule }}
-                                    </div>
-                                    <div class="flex justify-between items-center text-xs text-slate-400">
-                                        <span>Gini: <span class="text-white">{{ branch.gini }}</span></span>
-                                        <span>Samples: <span class="text-white">{{ branch.samples.toLocaleString() }}</span></span>
+                            <h4 class="text-cyan-300 font-semibold mb-4 text-sm uppercase tracking-wider">Random Forest Decision Branches (All Nodes)</h4>
+                            <div class="max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div v-for="branch in diagnostics.rf_branches" :key="branch.branch_id" class="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-cyan-500/50 transition duration-300">
+                                        <div class="flex justify-between items-center mb-3">
+                                            <span class="text-xs font-bold text-cyan-400 font-mono">{{ branch.branch_id }}</span>
+                                            <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-full tracking-wider"
+                                                  :class="branch.prediction === 'Operational' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'">
+                                                {{ branch.prediction }}
+                                            </span>
+                                        </div>
+                                        <div class="text-sm text-slate-200 font-mono mb-4 bg-slate-900 p-3 rounded border border-slate-700/50 break-words">
+                                            <span class="text-slate-500">IF</span> {{ branch.rule }}
+                                        </div>
+                                        <div class="flex justify-between items-center text-xs text-slate-400">
+                                            <span>Gini: <span class="text-white">{{ branch.gini }}</span></span>
+                                            <span>Samples: <span class="text-white">{{ branch.samples.toLocaleString() }}</span></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- Mathematical Foundations -->
+                <div class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden animate-fade-in-down" style="animation-delay: 0.3s">
+                    <div class="p-6 border-b border-slate-800 bg-slate-900/50">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-3">
+                            <svg class="w-6 h-6 text-fuchsia-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                            4. Mathematical Foundations
+                        </h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Random Forest Math -->
+                        <div class="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+                            <h4 class="text-fuchsia-300 font-semibold mb-4 text-sm uppercase tracking-wider">Random Forest Splitting Criteria</h4>
+                            
+                            <div class="mb-6">
+                                <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Gini Impurity Formula</div>
+                                <div class="bg-slate-900 border border-slate-700 rounded p-4 flex justify-center items-center font-serif text-2xl text-slate-200 tracking-wider">
+                                    <div class="flex items-center gap-2">
+                                        <i>Gini</i> = 1 - 
+                                        <div class="flex flex-col justify-center items-center relative mx-1">
+                                            <span class="text-[10px] leading-none text-slate-400"><i>c</i></span>
+                                            <span class="text-4xl leading-none">&sum;</span>
+                                            <span class="text-[10px] leading-none text-slate-400"><i>i=1</i></span>
+                                        </div>
+                                        (<i>p<sub>i</sub></i>)<sup>2</sup>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-2 text-center">Where <i>c</i> is total number of classes, and <i>p<sub>i</sub></i> is probability/proportion of class <i>i</i>.</p>
+                            </div>
+
+                            <div>
+                                <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Information Entropy Formula</div>
+                                <div class="bg-slate-900 border border-slate-700 rounded p-4 flex justify-center items-center font-serif text-2xl text-slate-200 tracking-wider">
+                                    <div class="flex items-center gap-2">
+                                        <i>Entropy</i> = - 
+                                        <div class="flex flex-col justify-center items-center relative mx-1">
+                                            <span class="text-[10px] leading-none text-slate-400"><i>c</i></span>
+                                            <span class="text-4xl leading-none">&sum;</span>
+                                            <span class="text-[10px] leading-none text-slate-400"><i>i=1</i></span>
+                                        </div>
+                                        <i>p<sub>i</sub></i> log<sub>2</sub>(<i>p<sub>i</sub></i>)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TOPSIS Math -->
+                        <div class="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+                            <h4 class="text-fuchsia-300 font-semibold mb-4 text-sm uppercase tracking-wider">TOPSIS Ranking Distance</h4>
+                            
+                            <div class="mb-6">
+                                <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Euclidean Distance to Ideal Best</div>
+                                <div class="bg-slate-900 border border-slate-700 rounded p-4 flex justify-center items-center font-serif text-2xl text-slate-200 tracking-wider">
+                                    <div class="flex items-center gap-2">
+                                        <i>D<sub>i</sub><sup>*</sup></i> = 
+                                        <span class="text-4xl font-light">&radic;</span>
+                                        <div class="border-t border-slate-200 pt-1 -ml-1 flex items-center gap-2"> 
+                                            <div class="flex flex-col justify-center items-center relative mx-1">
+                                                <span class="text-[10px] leading-none text-slate-400"><i>n</i></span>
+                                                <span class="text-3xl leading-none">&sum;</span>
+                                                <span class="text-[10px] leading-none text-slate-400"><i>j=1</i></span>
+                                            </div>
+                                            (<i>v<sub>ij</sub></i> - <i>v<sub>j</sub><sup>*</sup></i>)<sup>2</sup> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-2 text-center">Where <i>v<sub>ij</sub></i> is weighted normalized value, and <i>v<sub>j</sub><sup>*</sup></i> is ideal best value.</p>
+                            </div>
+
+                            <div>
+                                <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Performance Score (Ranking)</div>
+                                <div class="bg-slate-900 border border-slate-700 rounded p-4 flex justify-center items-center font-serif text-2xl text-slate-200 tracking-wider">
+                                    <div class="flex items-center gap-2">
+                                        <i>S<sub>i</sub></i> = 
+                                        <div class="inline-flex flex-col items-center">
+                                            <span class="border-b border-slate-200 px-2 pb-1"><i>D<sub>i</sub><sup>-</sup></i></span>
+                                            <span class="pt-1"><i>D<sub>i</sub><sup>*</sup></i> + <i>D<sub>i</sub><sup>-</sup></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -226,4 +314,19 @@ const props = defineProps({
     to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 .animate-fade-in-down { animation: fadeInDown 0.6s ease-out both; }
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5); 
+    border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.5); /* cyan-500 */
+    border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.8); 
+}
 </style>
