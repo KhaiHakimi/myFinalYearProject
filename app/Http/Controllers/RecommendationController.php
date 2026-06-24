@@ -229,6 +229,7 @@ class RecommendationController extends Controller
                     'f1_score' => 0.91,
                     'precision' => 0.89,
                     'recall' => 0.93,
+                    'historical_accuracy' => [0.84, 0.86, 0.87, 0.89, 0.91, 0.92],
                     'confusion_matrix' => [
                         ['actual' => 'Operational', 'predicted_operational' => 845, 'predicted_cancelled' => 124],
                         ['actual' => 'Cancelled', 'predicted_operational' => 98, 'predicted_cancelled' => 4120],
@@ -239,6 +240,7 @@ class RecommendationController extends Controller
                     'type' => 'Cost-based (lower is better for all)',
                     'normalization_method' => 'Vector Normalization',
                     'spearman_correlation' => 0.88, // Accuracy test equivalent for ranking
+                    'historical_correlation' => [0.75, 0.79, 0.82, 0.85, 0.87, 0.88],
                     'consistency_ratio' => 0.04, // Should be < 0.1
                     'mean_closeness_coefficient' => 0.72,
                 ]

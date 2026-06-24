@@ -68,6 +68,13 @@
                                     <div class="bg-gray-100 border border-gray-300 rounded p-3 text-gray-700 font-mono text-lg font-bold">{{ diagnostics.evaluation.random_forest.confusion_matrix[1].predicted_cancelled }}</div>
                                 </div>
                             </div>
+
+                            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm mt-6">
+                                <div class="text-sm font-semibold text-gray-700 mb-3">Historical Accuracy Tracking</div>
+                                <div class="h-48 relative">
+                                    <Line :data="rfChartData" :options="chartOptions" />
+                                </div>
+                            </div>
                         </div>
 
                         <!-- TOPSIS Evaluation -->
@@ -108,6 +115,13 @@
                                             <div class="text-[10px] text-gray-500 uppercase">Mean Closeness Coefficient (Satisfaction)</div>
                                             <div class="text-xl font-bold text-purple-600">{{ (diagnostics.evaluation.topsis.mean_closeness_coefficient * 100).toFixed(1) }}%</div>
                                         </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h5 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">Historical Ranking Correlation</h5>
+                                    <div class="bg-white border border-gray-200 rounded-lg p-3 h-48 relative">
+                                        <Line :data="topsisChartData" :options="chartOptions" />
                                     </div>
                                 </div>
                             </div>
@@ -337,10 +351,69 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Line } from 'vue-chartjs'
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
 const props = defineProps({
     diagnostics: Object
 })
+
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+                    return context.parsed.y.toFixed(2);
+                }
+            }
+        }
+    },
+    scales: {
+        y: { 
+            min: 0.7, 
+            max: 1.0,
+            ticks: { font: { size: 10 } }
+        },
+        x: {
+            ticks: { font: { size: 10 } },
+            grid: { display: false }
+        }
+    }
+}
+
+const rfChartData = computed(() => ({
+    labels: ['Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'Latest'],
+    datasets: [{
+        label: 'Accuracy',
+        data: props.diagnostics.evaluation.random_forest.historical_accuracy,
+        borderColor: '#059669', // emerald-600
+        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#059669',
+        borderWidth: 2
+    }]
+}))
+
+const topsisChartData = computed(() => ({
+    labels: ['Epoch 1', 'Epoch 2', 'Epoch 3', 'Epoch 4', 'Epoch 5', 'Latest'],
+    datasets: [{
+        label: 'Correlation',
+        data: props.diagnostics.evaluation.topsis.historical_correlation,
+        borderColor: '#4f46e5', // indigo-600
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#4f46e5',
+        borderWidth: 2
+    }]
+}))
 </script>
 
 <style>

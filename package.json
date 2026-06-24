@@ -26,10 +26,12 @@
     },
     "dependencies": {
         "@sakitam-gis/maplibre-wind": "^2.0.3",
+        "chart.js": "^4.5.1",
         "firebase": "^12.8.0",
         "leaflet": "^1.9.4",
         "leaflet-velocity": "^2.1.4",
         "maplibre-gl": "^4.7.1",
+        "vue-chartjs": "^5.3.3",
         "ws": "^8.19.0"
     }
 }
