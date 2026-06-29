@@ -530,6 +530,10 @@
                     <p class="text-xs text-rose-600 mt-1 font-medium">Proceeding with this booking carries a {{ Math.round(ai_prediction?.cancellation_probability * 100) || risk_analysis?.risk_score }}% risk of cancellation or delay.</p>
                 </div>
 
+                <div v-if="$page.props.flash.error" class="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 mb-6 text-sm font-bold">
+                    {{ $page.props.flash.error }}
+                </div>
+
                 <form @submit.prevent="submitBooking" class="space-y-6">
                     <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100 flex justify-between items-center">
                         <div>
@@ -666,7 +670,11 @@
         }
         bookingForm.post(route('payment.checkout'), {
             preserveScroll: true,
-            onSuccess: () => closeBookingModal(),
+            onSuccess: (page) => {
+                if (!page.props.flash.error) {
+                    closeBookingModal()
+                }
+            },
         })
     }
 

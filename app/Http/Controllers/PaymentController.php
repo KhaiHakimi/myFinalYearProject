@@ -31,7 +31,7 @@ class PaymentController extends Controller
 
         $schedule = Schedule::with(['ferry', 'origin', 'destination'])->findOrFail($validated['schedule_id']);
 
-        if (\Carbon\Carbon::parse($schedule->departure_time)->isPast()) {
+        if ($schedule->departure_time->copy()->addMinutes(15)->isPast()) {
             return redirect()->back()->with('error', 'This sailing has already departed and cannot be booked.');
         }
 
