@@ -68,6 +68,12 @@
                                     </div>
                                 </div>
                                 <div>
+                                    <div class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">Recommendation Accuracy</div>
+                                    <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-pink-300">
+                                        {{ analytics.ai_metrics?.recommendation_accuracy || '0.0' }}%
+                                    </div>
+                                </div>
+                                <div>
                                     <div class="text-indigo-200 text-xs font-bold uppercase tracking-wider mb-1">User Engagement</div>
                                     <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-300">
                                         {{ analytics.ai_metrics?.engagement || '0.0' }}%
@@ -240,6 +246,7 @@
         ai_metrics: {
             accuracy: 0,
             engagement: 0,
+            recommendation_accuracy: 0,
         }
     })
 
@@ -292,6 +299,7 @@
             if (analytics.value.ai_metrics) {
                 analytics.value.ai_metrics.accuracy = res.data.metrics.accuracy;
                 analytics.value.ai_metrics.engagement = res.data.metrics.engagement;
+                analytics.value.ai_metrics.recommendation_accuracy = res.data.metrics.recommendation_accuracy;
             } else {
                 analytics.value.ai_metrics = res.data.metrics;
             }

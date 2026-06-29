@@ -260,6 +260,7 @@ class PaymentController extends Controller
         // AI Performance Metrics (mocked via cache)
         $aiAccuracy = \Illuminate\Support\Facades\Cache::get('ai_accuracy', 92.4);
         $aiEngagement = \Illuminate\Support\Facades\Cache::get('ai_engagement', 85.1);
+        $aiRecommendationAccuracy = \Illuminate\Support\Facades\Cache::get('ai_recommendation_accuracy', 92.9);
 
         return response()->json([
             'revenue_by_day' => $revenueByDay,
@@ -272,6 +273,7 @@ class PaymentController extends Controller
             'ai_metrics' => [
                 'accuracy' => $aiAccuracy,
                 'engagement' => $aiEngagement,
+                'recommendation_accuracy' => $aiRecommendationAccuracy,
             ],
         ]);
     }
