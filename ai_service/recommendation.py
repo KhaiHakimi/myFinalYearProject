@@ -531,9 +531,9 @@ def apply_topsis(all_routes, preference="balanced"):
         
     weights = {
         "balanced": [0.35, 0.25, 0.25, 0.15],
-        "cheapest": [0.55, 0.15, 0.20, 0.10],
-        "fastest":  [0.15, 0.55, 0.15, 0.15],
-        "safest":   [0.15, 0.15, 0.55, 0.15],
+        "cheapest": [0.94, 0.02, 0.02, 0.02],
+        "fastest":  [0.02, 0.94, 0.02, 0.02],
+        "safest":   [0.02, 0.02, 0.94, 0.02],
     }
     w = weights.get(preference, weights["balanced"])
     
