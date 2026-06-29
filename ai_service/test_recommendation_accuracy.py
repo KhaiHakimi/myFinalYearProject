@@ -6,7 +6,7 @@ import requests
 
 def fetch_real_routes():
     try:
-        api_url = os.environ.get("FERRYCAST_API_URL", "http://127.0.0.1/api")
+        api_url = os.environ.get("FERRYCAST_API_URL", "https://ferrycast.space/api")
         response = requests.get(f"{api_url}/ai/active-routes", timeout=15)
         response.raise_for_status()
         data = response.json()

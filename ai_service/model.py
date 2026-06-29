@@ -145,7 +145,7 @@ def train_model(force_retrain=False):
     print("[FerryCast AI] Fetching real maritime training data from database...")
     try:
         # In production this will hit the hosted API. Locally it hits Laragon.
-        api_url = os.environ.get("FERRYCAST_API_URL", "http://127.0.0.1/api")
+        api_url = os.environ.get("FERRYCAST_API_URL", "https://ferrycast.space/api")
         response = requests.get(f"{api_url}/ai/training-data", timeout=15)
         response.raise_for_status()
         data = response.json()
