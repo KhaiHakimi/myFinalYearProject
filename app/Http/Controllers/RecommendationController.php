@@ -316,4 +316,62 @@ class RecommendationController extends Controller
             'diagnostics' => $diagnostics
         ]);
     }
+
+    public function getTrainingData(Request $request)
+    {
+        $schedules = Schedule::join('weather_data', function ($join) {
+                $join->on('schedules.origin_port_id', '=', 'weather_data.port_id')
+                     ->on('schedules.departure_time', '=', 'weather_data.recorded_at');
+            })
+            ->select(
+                'schedules.id',
+                'schedules.departure_time',
+                'schedules.status',
+                'weather_data.wind_speed',
+                'weather_data.wave_height',
+                'weather_data.visibility'
+            )
+            ->limit(10000)
+            ->get();
+
+        $data = $schedules->map(function ($schedule) {
+            $dep = \Carbon\Carbon::parse($schedule->departure_time);
+            return [
+                'wind_speed' => (float) $schedule->wind_speed,
+                'wave_height' => (float) $schedule->wave_height,
+                'visibility' => (float) $schedule->visibility,
+                'hour_of_day' => $dep->hour,
+                'month' => $dep->month,
+                'cancelled' => $schedule->status === 'cancelled' ? 1 : 0
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+    public function getActiveRoutes(Request $request)
+    {
+        $schedules = Schedule::with(['ferry', 'origin', 'destination'])
+            ->where('departure_time', '>=', now())
+            ->limit(100)
+            ->get();
+            
+        $routes = $schedules->map(function ($schedule) {
+            $dep = \Carbon\Carbon::parse($schedule->departure_time);
+            $arr = \Carbon\Carbon::parse($schedule->arrival_time);
+            $duration_hours = max(0.5, $arr->diffInMinutes($dep) / 60);
+            
+            return [
+                'route_id' => $schedule->id,
+                'origin' => $schedule->origin->name ?? 'Unknown',
+                'destination' => $schedule->destination->name ?? 'Unknown',
+                'price' => (float) $schedule->price,
+                'duration_hours' => $duration_hours,
+                'safety_rating' => rand(70, 100) / 100, // Simulated safety rating
+                'transfers' => 0
+            ];
+        });
+        
+        return response()->json($routes);
+    }
 }
