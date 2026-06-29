@@ -188,37 +188,39 @@ class RecommendationController extends Controller
         return $ferryOptions;
     }
 
-    /**
-     * Train the AI predictive and recommendation algorithm.
-     * This simulates the training process and updates the metrics in the cache.
-     */
     public function train(Request $request)
     {
-        // Simulate training delay (e.g. sending request to a python backend)
-        sleep(2);
+        $aiUrl = env('AI_SERVICE_URL', 'http://127.0.0.1:5001');
 
-        $currentAccuracy = \Illuminate\Support\Facades\Cache::get('ai_accuracy', 92.4);
-        $currentEngagement = \Illuminate\Support\Facades\Cache::get('ai_engagement', 85.1);
+        try {
+            // Trigger actual retraining on the Python AI backend
+            $response = Http::timeout(60)->post("{$aiUrl}/retrain");
 
-        // Improve slightly to simulate learning
-        $newAccuracy = min(99.9, $currentAccuracy + (rand(1, 15) / 10));
-        $newEngagement = min(99.9, $currentEngagement + (rand(1, 15) / 10));
+            if ($response->successful()) {
+                $result = $response->json();
+                $elapsed = $result['elapsed'] ?? 0;
+                
+                return response()->json([
+                    'message' => "AI algorithm successfully re-trained in {$elapsed} seconds with latest synthetic data.",
+                    'metrics' => [
+                        'accuracy' => 92.4, // Live metric would require python backend update
+                        'engagement' => 85.1,
+                    ]
+                ]);
+            }
 
-        \Illuminate\Support\Facades\Cache::put('ai_accuracy', round($newAccuracy, 1));
-        \Illuminate\Support\Facades\Cache::put('ai_engagement', round($newEngagement, 1));
+            return response()->json([
+                'error' => 'AI training failed on the Python service.',
+            ], 500);
 
-        return response()->json([
-            'message' => 'AI algorithm successfully trained with latest booking data.',
-            'metrics' => [
-                'accuracy' => round($newAccuracy, 1),
-                'engagement' => round($newEngagement, 1),
-            ]
-        ]);
+        } catch (\Exception $e) {
+            Log::error('AI training failed: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Could not reach AI recommendation service for training.',
+            ], 503);
+        }
     }
 
-    /**
-     * Render the detailed AI Diagnostics page.
-     */
     public function diagnosticsPage()
     {
         // Mock data reflecting the Python AI pipeline details
@@ -291,6 +293,24 @@ class RecommendationController extends Controller
                 ]
             ]
         ];
+
+        // Fetch live stats from python AI
+        $aiUrl = env('AI_SERVICE_URL', 'http://127.0.0.1:5001');
+        try {
+            $response = Http::timeout(5)->get("{$aiUrl}/model/stats");
+            if ($response->successful()) {
+                $stats = $response->json();
+                $diagnostics['hyperparameters']['random_forest'] = [
+                    'model_type' => $stats['model_type'] ?? 'RandomForestClassifier',
+                    'n_estimators' => $stats['n_estimators'] ?? 400,
+                    'max_depth' => $stats['max_depth'] ?? 25,
+                    'n_features' => $stats['n_features'] ?? 8,
+                    'training_data_size' => $stats['training_data_size'] ?? 15000,
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::warning('Could not fetch AI model stats: ' . $e->getMessage());
+        }
 
         return \Inertia\Inertia::render('Admin/AiDiagnostics', [
             'diagnostics' => $diagnostics
