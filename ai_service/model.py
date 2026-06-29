@@ -141,32 +141,8 @@ def train_model(force_retrain=False):
     if not force_retrain and os.path.exists(MODEL_PATH):
         return joblib.load(MODEL_PATH)
 
-    import requests
-    print("[FerryCast AI] Fetching real maritime training data from database...")
-    try:
-        # In production this will hit the hosted API. Locally it hits Laragon.
-        api_url = os.environ.get("FERRYCAST_API_URL", "https://ferrycast.space/api")
-        response = requests.get(f"{api_url}/ai/training-data", timeout=15)
-        response.raise_for_status()
-        data = response.json()
-        
-        if not data or len(data) < 50:
-            print(f"[FerryCast AI] Warning: Only {len(data) if data else 0} real records found. Falling back to synthetic generator.")
-            df = generate_training_data(n_samples=100_000)
-        else:
-            df = pd.DataFrame(data)
-            # Impute missing features that the DB doesn't track yet but the model needs
-            if "wind_direction" not in df.columns:
-                df["wind_direction"] = np.random.uniform(0, 360, len(df))
-            if "wave_period" not in df.columns:
-                df["wave_period"] = (6 + df["wave_height"] * 1.2).clip(2, 20)
-            if "swell_height" not in df.columns:
-                df["swell_height"] = (df["wave_height"] * 0.6).clip(0, 6)
-                
-            print(f"[FerryCast AI] Successfully loaded {len(df)} historical records from the database.")
-    except Exception as e:
-        print(f"[FerryCast AI] API request failed: {e}. Falling back to synthetic generator.")
-        df = generate_training_data(n_samples=100_000)
+    print("[FerryCast AI] Generating synthetic maritime training data...")
+    df = generate_training_data(n_samples=100_000)
 
     X = df[FEATURE_NAMES]
     y = df["cancelled"]

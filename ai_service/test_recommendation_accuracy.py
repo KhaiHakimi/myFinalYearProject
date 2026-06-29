@@ -1,41 +1,18 @@
 import random
 from recommendation import apply_topsis
 
-import os
-import requests
-
-def fetch_real_routes():
-    try:
-        api_url = os.environ.get("FERRYCAST_API_URL", "https://ferrycast.space/api")
-        response = requests.get(f"{api_url}/ai/active-routes", timeout=15)
-        response.raise_for_status()
-        data = response.json()
-        
-        routes = []
-        for r in data:
-            routes.append({
-                "id": r["route_id"],
-                "mode": "ferry",
-                "total_cost": r["price"],
-                "total_duration_min": r["duration_hours"] * 60,
-                "safety_risk": 1.0 - r["safety_rating"], # convert rating to risk
-                "transfers": r["transfers"],
-            })
-        return routes
-    except Exception as e:
-        print(f"Warning: Failed to fetch real routes ({e}). Falling back to synthetic.")
-        # Fallback generator
-        routes = []
-        for i in range(20):
-            routes.append({
-                "id": i,
-                "mode": random.choice(["ferry", "bus", "flight"]),
-                "total_cost": random.uniform(20, 300),
-                "total_duration_min": random.uniform(40, 600),
-                "safety_risk": random.uniform(0.01, 0.20),
-                "transfers": random.randint(0, 3),
-            })
-        return routes
+def generate_random_routes(n=10):
+    routes = []
+    for i in range(n):
+        routes.append({
+            "id": i,
+            "mode": random.choice(["ferry", "bus", "flight"]),
+            "total_cost": random.uniform(20, 300),
+            "total_duration_min": random.uniform(40, 600),
+            "safety_risk": random.uniform(0.01, 0.20),
+            "transfers": random.randint(0, 3),
+        })
+    return routes
 
 def spearman_correlation(list1, list2):
     """
@@ -63,23 +40,14 @@ def test_topsis_accuracy(num_trials=1000, routes_per_trial=10):
     print("=" * 60)
     print("[FerryCast AI] Recommendation Accuracy & Ranking Evaluation")
     print("=" * 60)
-    
-    real_routes_pool = fetch_real_routes()
-    if len(real_routes_pool) < routes_per_trial:
-        routes_per_trial = max(1, len(real_routes_pool))
-        
-    print(f"Loaded {len(real_routes_pool)} real routes from the database.")
-    print(f"Simulating {num_trials} searches, each with {routes_per_trial} real route options...\n")
+    print(f"Simulating {num_trials} searches, each with {routes_per_trial} varied route options...\n")
     
     for pref, ground_truth_key in preferences.items():
         correlations = []
         top_1_matches = 0
         
         for _ in range(num_trials):
-            # Pick a random subset of real routes to simulate a user search
-            routes = random.sample(real_routes_pool, routes_per_trial)
-            # Make a deep copy to avoid apply_topsis mutating the pool
-            routes = [r.copy() for r in routes]
+            routes = generate_random_routes(routes_per_trial)
             
             # 1. Baseline "Ground Truth" (Sorted purely by the single metric)
             gt_sorted = sorted(routes, key=lambda x: x[ground_truth_key])
