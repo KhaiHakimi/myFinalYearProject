@@ -33,7 +33,7 @@ class ChannelManagerController extends Controller
             'Perak'       => ['Lumut', 'Pangkor'],
             'Selangor'    => ['Port Klang', 'Pulau Ketam'],
             'Melaka'      => ['Melaka City'],
-            'Johor'       => ['Mersing', 'Iskandar Puteri', 'Muar'],
+            'Johor'       => ['Mersing', 'Iskandar Puteri'],
             'Pahang'      => ['Kuala Rompin', 'Tioman Island'],
             'Terengganu'  => ['Kuala Terengganu', 'Setiu', 'Besut', 'Marang', 'Kapas Island', 'Redang Island', 'Perhentian Island'],
             'Indonesia'   => ['Dumai', 'Bengkalis', 'Batam'],

@@ -1539,7 +1539,6 @@
         Melaka: ['Melaka International Ferry Terminal'],
         Johor: [
             'Mersing Jetty',
-            'Jeti Tanjung Emas Muar',
             'Puteri Harbour International Ferry Terminal',
             'Pasir Gudang Ferry Terminal',
             'Kukup International Ferry Terminal',

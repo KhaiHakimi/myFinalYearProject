@@ -27,8 +27,8 @@ class WeatherController extends Controller
             $weather = $port->weatherData()->latest()->first();
         }
 
-        // --- DUMMY DATA INJECTION (MERSING ONLY) ---
-        // Forcing High Risk data for demonstration/testing purposes
+        // --- DUMMY DATA INJECTION (MERSING & SOUTH PORT ONLY) ---
+        // Forcing Risk data for demonstration/testing purposes
         if (str_contains(strtolower($port->name), 'mersing')) {
             $weather = new \App\Models\WeatherData([
                 'port_id' => $port->id,
@@ -41,6 +41,19 @@ class WeatherController extends Controller
                 'condition_code' => 65,
                 'risk_status' => 'High Risk',
                 'risk_score' => 92,
+            ]);
+        } elseif (str_contains(strtolower($port->name), 'south port')) {
+            $weather = new \App\Models\WeatherData([
+                'port_id' => $port->id,
+                'timestamp' => now(),
+                'wind_speed' => 45.0,
+                'wind_direction' => 180,
+                'temperature' => 29.0,
+                'precipitation' => 15.0,
+                'wave_height' => 1.8,
+                'condition_code' => 61,
+                'risk_status' => 'Caution',
+                'risk_score' => 55,
             ]);
         }
         // ----------------------------

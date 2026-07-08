@@ -112,40 +112,40 @@ class ScheduleSeeder extends Seeder
 
             // --- PERHENTIAN / REDANG (East Coast) ---
             [
-                'origin_id' => 24, // Kuala Besut
-                'dest_id' => 26,   // Perhentian
+                'origin_id' => 23, // Kuala Besut
+                'dest_id' => 25,   // Perhentian
                 'ferries' => [27, 28, 29], // Perhentian Trans
                 'price' => 35.00,
                 'duration' => 45,
                 'times' => ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'],
             ],
             [
-                'origin_id' => 26, // Perhentian
-                'dest_id' => 24,   // Kuala Besut
+                'origin_id' => 25, // Perhentian
+                'dest_id' => 23,   // Kuala Besut
                 'ferries' => [27, 28, 29],
                 'price' => 35.00,
                 'duration' => 45,
                 'times' => ['08:00', '12:00', '16:00'],
             ],
             [
-                'origin_id' => 22, // Shahbandar (KT)
-                'dest_id' => 25,   // Redang
+                'origin_id' => 21, // Shahbandar (KT)
+                'dest_id' => 24,   // Redang
                 'ferries' => [25], // Redang Express
                 'price' => 55.00,
                 'duration' => 90,
                 'times' => ['09:00', '10:30', '15:00'],
             ],
             [
-                'origin_id' => 23, // Merang
-                'dest_id' => 25,   // Redang
+                'origin_id' => 22, // Merang
+                'dest_id' => 24,   // Redang
                 'ferries' => [26, 31], // MGH Boat?
                 'price' => 55.00,
                 'duration' => 45,
                 'times' => ['08:00', '09:30', '11:00', '13:00', '15:00'],
             ],
             [
-                'origin_id' => 27, // Marang
-                'dest_id' => 28,   // Kapas
+                'origin_id' => 26, // Marang
+                'dest_id' => 27,   // Kapas
                 'ferries' => [30], // Kapas Boat
                 'price' => 20.00,
                 'duration' => 15,
@@ -154,24 +154,17 @@ class ScheduleSeeder extends Seeder
 
             // --- INTERNATIONAL ---
             [
-                'origin_id' => 17, // Melaka
-                'dest_id' => 18,   // Dumai
+                'origin_id' => 16, // Melaka
+                'dest_id' => 17,   // Dumai
                 'ferries' => [32, 33], // Indomal / Tunas Rupat
                 'price' => 150.00,
                 'duration' => 120,
                 'times' => ['08:30', '10:00'],
             ],
+
             [
-                'origin_id' => 15, // Muar
-                'dest_id' => 19,   // Bengkalis
-                'ferries' => [34], // Putri Anggreni
-                'price' => 135.00,
-                'duration' => 150,
-                'times' => ['09:00', '13:00'],
-            ],
-            [
-                'origin_id' => 16, // Puteri Harbour
-                'dest_id' => 21,   // Harbour Bay (Batam)
+                'origin_id' => 15, // Puteri Harbour
+                'dest_id' => 20,   // Harbour Bay (Batam)
                 'ferries' => [34], // Putri Anggreni
                 'price' => 110.00,
                 'duration' => 90,

@@ -56,7 +56,6 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Mersing Jetty', 'location' => 'Mersing, Johor', 'latitude' => 2.4333, 'longitude' => 103.8333],
             ['name' => 'Tanjung Gemok Jetty', 'location' => 'Kuala Rompin, Pahang', 'latitude' => 2.6636, 'longitude' => 103.6264],
             ['name' => 'Tioman Island Marina', 'location' => 'Tioman Island, Pahang', 'latitude' => 2.8167, 'longitude' => 104.1667],
-            ['name' => 'Jeti Tanjung Emas Muar', 'location' => 'Muar, Johor', 'latitude' => 2.0460, 'longitude' => 102.5580],
             ['name' => 'Puteri Harbour International Ferry Terminal', 'location' => 'Iskandar Puteri, Johor', 'latitude' => 1.4200, 'longitude' => 103.6600],
             ['name' => 'Melaka International Ferry Terminal', 'location' => 'Melaka City, Melaka', 'latitude' => 2.1896, 'longitude' => 102.2460],
 

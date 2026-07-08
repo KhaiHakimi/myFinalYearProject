@@ -164,20 +164,94 @@
         return currentOrigin.value ? 9 : 6
     })
 
+    const actualRoutes = ref({});
+    const fetchRoute = async (start, end, id) => {
+        const apiKey = import.meta.env.VITE_ORS_API_KEY;
+        if (!apiKey) return;
+        
+        const startLng = start.lng || start.longitude;
+        const startLat = start.lat || start.latitude;
+        const endLng = end.lng || end.longitude;
+        const endLat = end.lat || end.latitude;
+
+        if (!startLng || !startLat || !endLng || !endLat) return;
+
+        try {
+            const response = await fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${startLng},${startLat}&end=${endLng},${endLat}`);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.features && data.features.length > 0) {
+                    const coordinates = data.features[0].geometry.coordinates;
+                    actualRoutes.value[id] = coordinates.map(coord => ({ lat: coord[1], lng: coord[0] }));
+                }
+            }
+        } catch (e) {
+            console.error('Failed to fetch route:', e);
+        }
+    }
+
+    watch([userLocation, selectedOrigin, geoAnalysisResult], () => {
+        actualRoutes.value = {}; // Reset routes
+        if (!userLocation.value) return;
+
+        if (selectedOrigin.value) {
+            fetchRoute(userLocation.value, selectedOrigin.value, 'user-to-selected');
+        } else if (geoAnalysisResult.value) {
+            const nearestAny = geoAnalysisResult.value.nearest_any_port?.port;
+            const nearestSafe = geoAnalysisResult.value.nearest_safe_port?.port;
+            if (nearestAny && nearestSafe && nearestAny.id !== nearestSafe.id) {
+                fetchRoute(userLocation.value, nearestAny, 'user-to-nearest');
+                fetchRoute(userLocation.value, nearestSafe, 'user-to-safe');
+            } else if (nearestSafe) {
+                fetchRoute(userLocation.value, nearestSafe, 'user-to-nearest-safe');
+            } else if (nearestAny) {
+                fetchRoute(userLocation.value, nearestAny, 'user-to-nearest-only');
+            }
+        } else if (peninsularPorts.value.length > 0) {
+            fetchRoute(userLocation.value, peninsularPorts.value[0], 'nearest-route-fallback');
+        }
+    }, { deep: true, immediate: true });
+
     const mapRoutes = computed(() => {
         const routes = []
 
+        const addFerryRoutes = (portObj) => {
+            if (!portObj) return;
+            const fullPort = allPorts.value.find((p) => p.id === portObj.id)
+            if (fullPort && fullPort.departures) {
+                const destIds = new Set();
+                fullPort.departures.forEach(departure => {
+                    if (departure.destination && !destIds.has(departure.destination.id)) {
+                        destIds.add(departure.destination.id);
+                        routes.push({
+                            id: `ferry-route-${fullPort.id}-${departure.destination.id}`,
+                            path: [
+                                { lat: parseFloat(fullPort.latitude), lng: parseFloat(fullPort.longitude) },
+                                { lat: parseFloat(departure.destination.latitude), lng: parseFloat(departure.destination.longitude) }
+                            ],
+                            color: '#3B82F6', // Blue line
+                            weight: 3,
+                            dashArray: '5, 5'
+                        });
+                    }
+                });
+            }
+        };
+
         // 1. If user clicked a specific jetty directly
-        if (selectedOrigin.value && userLocation.value) {
-            routes.push({
-                id: 'user-to-selected',
-                path: [
-                    { lat: userLocation.value.lat, lng: userLocation.value.lng },
-                    { lat: parseFloat(selectedOrigin.value.lat), lng: parseFloat(selectedOrigin.value.lng) }
-                ],
-                color: '#10B981', // Emerald (Green) line
-                weight: 4
-            })
+        if (selectedOrigin.value) {
+            if (userLocation.value) {
+                routes.push({
+                    id: 'user-to-selected',
+                    path: actualRoutes.value['user-to-selected'] || [
+                        { lat: userLocation.value.lat, lng: userLocation.value.lng },
+                        { lat: parseFloat(selectedOrigin.value.lat), lng: parseFloat(selectedOrigin.value.lng) }
+                    ],
+                    color: '#10B981', // Emerald (Green) line
+                    weight: 4
+                })
+            }
+            addFerryRoutes(selectedOrigin.value)
             return routes
         }
 
@@ -191,7 +265,7 @@
                     // Show line to nearest (which is unsafe) as red/dashed
                     routes.push({
                         id: 'user-to-nearest',
-                        path: [
+                        path: actualRoutes.value['user-to-nearest'] || [
                             { lat: userLocation.value.lat, lng: userLocation.value.lng },
                             { lat: parseFloat(nearestAny.latitude), lng: parseFloat(nearestAny.longitude) }
                         ],
@@ -202,30 +276,32 @@
                     // Show line to recommended safe destination as green
                     routes.push({
                         id: 'user-to-safe',
-                        path: [
+                        path: actualRoutes.value['user-to-safe'] || [
                             { lat: userLocation.value.lat, lng: userLocation.value.lng },
                             { lat: parseFloat(nearestSafe.latitude), lng: parseFloat(nearestSafe.longitude) }
                         ],
                         color: '#10B981', // Green line
                         weight: 4
                     })
+                    addFerryRoutes(nearestSafe)
                 } else {
                     // Nearest is safe, show single green line
                     routes.push({
                         id: 'user-to-nearest-safe',
-                        path: [
+                        path: actualRoutes.value['user-to-nearest-safe'] || [
                             { lat: userLocation.value.lat, lng: userLocation.value.lng },
                             { lat: parseFloat(nearestSafe.latitude), lng: parseFloat(nearestSafe.longitude) }
                         ],
                         color: '#10B981', // Green line
                         weight: 4
                     })
+                    addFerryRoutes(nearestSafe)
                 }
             } else if (nearestAny) {
                 // Edge case: No safe ports exist, just show line to nearest
                 routes.push({
                     id: 'user-to-nearest-only',
-                    path: [
+                    path: actualRoutes.value['user-to-nearest-only'] || [
                         { lat: userLocation.value.lat, lng: userLocation.value.lng },
                         { lat: parseFloat(nearestAny.latitude), lng: parseFloat(nearestAny.longitude) }
                     ],
@@ -233,6 +309,7 @@
                     weight: 4,
                     dashArray: '5, 8'
                 })
+                addFerryRoutes(nearestAny)
             }
             
             return routes
@@ -244,7 +321,7 @@
             if (nearestPort && nearestPort.latitude && nearestPort.longitude) {
                 routes.push({
                     id: 'nearest-route-fallback',
-                    path: [
+                    path: actualRoutes.value['nearest-route-fallback'] || [
                         { lat: userLocation.value.lat, lng: userLocation.value.lng },
                         { lat: parseFloat(nearestPort.latitude), lng: parseFloat(nearestPort.longitude) }
                     ],
@@ -755,11 +832,15 @@
                                             <div class="flex flex-col gap-2">
                                                 <div class="flex items-center gap-2">
                                                     <div class="w-6 border-t-2 border-emerald-500"></div>
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Safe Route</span>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">User to Jetty Route</span>
                                                 </div>
                                                 <div class="flex items-center gap-2">
                                                     <div class="w-6 border-t-2 border-red-500 border-dashed"></div>
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-700">High-Risk Route</span>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-red-700">High-Risk Jetty Route</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-6 border-t-2 border-blue-500 border-dashed"></div>
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-700">Ferry Route</span>
                                                 </div>
                                             </div>
                                         </div>
