@@ -166,7 +166,7 @@
 
     const actualRoutes = ref({});
     const fetchRoute = async (start, end, id) => {
-        const apiKey = import.meta.env.VITE_ORS_API_KEY;
+        const apiKey = import.meta.env.VITE_ORS_API_KEY || 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImFiZTAwNjliOWI1NjQ3Yzk4YzAyZGQ2NmQyMjMxMmNhIiwiaCI6Im11cm11cjY0In0=';
         if (!apiKey) return;
         
         const startLng = start.lng || start.longitude;
@@ -190,7 +190,7 @@
         }
     }
 
-    watch([userLocation, selectedOrigin, geoAnalysisResult], () => {
+    watch([userLocation, selectedOrigin, geoAnalysisResult, peninsularPorts], () => {
         actualRoutes.value = {}; // Reset routes
         if (!userLocation.value) return;
 
