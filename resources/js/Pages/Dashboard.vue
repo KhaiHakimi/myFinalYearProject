@@ -99,6 +99,17 @@
     // ==========================================
     // 2. MAP DATA PREPARATION
     // ==========================================
+    const peninsularPorts = computed(() => {
+        return allPorts.value.filter((port) => {
+            const loc = (port.location || '').toLowerCase()
+            const isInternational =
+                loc.includes('indonesia') || loc.includes('singapore')
+            const isEastMalaysia = port.longitude && port.longitude > 109.0
+
+            return !isInternational && !isEastMalaysia
+        })
+    })
+
     const mapMarkers = computed(() => {
         const markers = []
 
@@ -485,19 +496,8 @@
     }
 
     // ==========================================
-    // 5. PENINSULAR FILTER (Computed)
+    // 5. DISPLAY PORTS
     // ==========================================
-    const peninsularPorts = computed(() => {
-        return allPorts.value.filter((port) => {
-            const loc = (port.location || '').toLowerCase()
-            const isInternational =
-                loc.includes('indonesia') || loc.includes('singapore')
-            const isEastMalaysia = port.longitude && port.longitude > 109.0
-
-            return !isInternational && !isEastMalaysia
-        })
-    })
-
     const displayPorts = computed(() => {
         if (!selectedOrigin.value) {
             return peninsularPorts.value.slice(0, 3)
